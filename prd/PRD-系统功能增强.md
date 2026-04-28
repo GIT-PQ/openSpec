@@ -349,15 +349,19 @@ PatentServiceImpl 收到结果
 │  [ 开始分类 ]                                               │
 │                                                             │
 ├─────────────────────────────────────────────────────────────┤
-│  分类进度                                                    │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │  ████████████░░░░░░░░░░░  48/100  48%               │    │
-│  └─────────────────────────────────────────────────────┘    │
-│  正在分类: 一种医用成像...                                    │
+│  分类处理                                                    │
+│                                                             │
+│  ⏳ 正在处理中，请稍候...                                    │
 │                                                             │
 │  [ 查看结果 ]  ← 分类完成后跳转历史页面(自动筛选当前批次)     │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+**交互说明**：
+- 上传文件后，调用预览接口获取列名列表和前5行数据
+- 用户从下拉框选择摘要列（不做智能匹配）
+- 点击"开始分类"后，前端展示"正在处理中"状态，同步等待后端返回
+- 分类完成后显示结果摘要（成功数、失败数），可跳转历史页面
 
 ### 6.3 数据流
 
@@ -365,23 +369,39 @@ PatentServiceImpl 收到结果
 前端上传Excel
      │
      ▼
-Java后端 /api/patent/batch-classify
+Java后端 POST /api/patent/upload-preview
      │
-     ├─ 解析Excel，提取摘要列
+     ├─ 解析Excel，提取列名列表
+     ├─ 提取前5行数据用于预览
+     │
+     ▼
+返回 { columns: [...], previewRows: [...] }
+     │
+     ▼
+前端展示预览，用户选择摘要列
+     │
+     ▼
+前端调用 POST /api/patent/batch-classify
+     │
+     ▼
+Java后端 batchClassify
+     │
+     ├─ 解析Excel，提取指定摘要列
      ├─ 生成 batch_id（UUID）
      ├─ 逐条调用 Python /predict
      │     │
-     │     ▼
-     │  Python服务（已有单条推理能力）
+     │     ├─ 成功 → 收集结果
+     │     └─ 失败 → 记录到 failedList，继续处理下一条
      │     │
      │     ▼
-     ├─ 收集所有结果，批量写入 classification_record（source='batch', batch_id）
+     ├─ 成功的结果批量写入 classification_record
+     │     （source='batch', batch_id）
      │
      ▼
-返回 { batchId, total, results[] }
+返回 { batchId, total, success, failed, results }
      │
      ▼
-前端展示进度 → 完成后跳转历史页（筛选 batch_id）
+前端展示结果 → 跳转历史页（筛选 batch_id）
 ```
 
 **关于批量推理策略**：采用Java后端逐条调用Python单条推理接口，而非Python端新增批量接口。理由：
@@ -390,60 +410,137 @@ Java后端 /api/patent/batch-classify
 - 便于逐条记录进度和错误处理
 - 50条以内的规模，逐条调用延迟可接受
 
-### 6.4 API 设计
+### 6.4 设计决策
+
+#### 6.4.1 进度反馈机制
+
+采用同步等待策略，前端只展示"正在处理中"状态：
+- 前端无需轮询或WebSocket，实现简单
+- 50条处理时间预估：GPU环境约25秒，CPU环境约100秒
+- 处理期间按钮禁用，防止重复提交
+
+#### 6.4.2 错误处理策略
+
+采用继续处理策略，单条失败不中断整体流程：
+- Python调用失败时，记录到 `failed` 列表，继续处理下一条
+- 失败的条目**不存入数据库**，只在响应中返回
+- 用户可在分类完成后查看 `failed` 列表，手动修正数据后重新上传
+
+响应结构中 `failedList` 字段格式：
+```json
+{
+  "failedList": [
+    {
+      "summary": "失败的摘要文本",
+      "error": "Python服务超时"
+    }
+  ]
+}
+```
+
+#### 6.4.3 来源列显示批次ID
+
+分类记录的 `source` 字段在历史页面显示时：
+- 单条分类：显示"单条输入"
+- 批量分类：显示"批量(批次ID)"，如"批量(uuid-abc123)"
+- 详情弹窗中也显示批次ID
+
+#### 6.4.4 文件预览实现
+
+采用后端解析策略：
+- 新增 `/api/patent/upload-preview` 接口
+- 返回列名列表和前5行数据
+- 与 `batchClassify` 共用Excel解析逻辑，避免前端引入解析库
+
+### 6.5 API 设计
 
 | 方法 | 路径 | 说明 |
 |------|------|------|
+| POST | `/api/patent/upload-preview` | 上传文件预览，返回列名和前5行数据 |
 | POST | `/api/patent/batch-classify` | 上传文件并执行批量分类 |
 
-**请求**：`multipart/form-data`，包含 `file`（Excel文件）和 `summaryColumn`（摘要列名，默认"摘要"）。
+#### upload-preview 接口
+
+**请求**：`multipart/form-data`，包含 `file`（Excel文件）
 
 **响应**：
+```json
+{
+  "code": 200,
+  "message": "文件解析成功",
+  "data": {
+    "columns": ["序号", "摘要", "申请人", "申请日"],
+    "previewRows": [
+      {"序号": 1, "摘要": "一种...", "申请人": "XX公司", "申请日": "2024-01"},
+      {"序号": 2, "摘要": "本发明...", "申请人": "YY公司", "申请日": "2024-02"}
+    ],
+    "totalRows": 50
+  }
+}
+```
 
+#### batch-classify 接口
+
+**请求**：`multipart/form-data`，包含 `file`（Excel文件）和 `summaryColumn`（摘要列名）。
+
+**响应**：
 ```json
 {
   "code": 200,
   "message": "批量分类完成",
   "data": {
     "batchId": "uuid-xxx",
-    "total": 100,
-    "success": 98,
+    "total": 50,
+    "success": 48,
     "failed": 2,
     "results": [
       {
         "summary": "一种...",
         "predLabel": "医用成像器械",
+        "predIndex": 3,
         "predProbability": 0.8523
+      }
+    ],
+    "failedList": [
+      {
+        "summary": "失败的摘要文本",
+        "error": "Python服务超时"
       }
     ]
   }
 }
 ```
 
-### 6.5 改动范围
+### 6.6 改动范围
 
 | 层 | 改动点 | 说明 |
 |----|--------|------|
-| Java后端 | pom.xml 新增 Apache POI 或 EasyExcel 依赖 | 用于解析上传的Excel文件 |
-| Java后端 | `PatentController` 新增 `batchClassify` 方法 | 接收文件+解析+逐条推理+批量存库 |
+| Java后端 | pom.xml 新增 EasyExcel 依赖 | 用于解析Excel文件（与步骤3共用） |
+| Java后端 | `PatentController` 新增 `uploadPreview` 方法 | 文件预览接口 |
+| Java后端 | `PatentController` 新增 `batchClassify` 方法 | 批量分类接口 |
+| Java后端 | `PatentService` 新增 `parseExcel` 方法 | Excel解析逻辑（preview和batch共用） |
 | Java后端 | `PatentService` 新增 `batchClassify` 方法 | 编排批量分类逻辑 |
 | Java后端 | `RecordService` 新增 `batchInsert` 方法 | 批量插入分类记录 |
-| 前端 | 新增 `BatchClassification.vue` | 批量分类页面（上传+预览+进度+结果） |
+| 前端 | 新增 `BatchClassification.vue` | 批量分类页面（上传+预览+处理状态+结果） |
 | 前端 | 修改 `router/index.js` | 新增路由 |
 | 前端 | 修改 `App.vue` | 导航栏新增"批量分类"菜单项 |
 | 前端 | 修改 `HomeView.vue` | 首页新增"批量分类"功能卡片 |
-| 前端 | 修改 `api/index.js` | 新增批量分类接口 |
+| 前端 | 修改 `ClassificationHistory.vue` | 来源列显示批次ID |
+| 前端 | 修改 `api/index.js` | 新增预览和批量分类接口 |
 | Python服务 | 无改动 | 复用现有 `/predict` 单条推理接口 |
 
-### 6.6 验收标准
+### 6.7 验收标准
 
 - 支持上传 `.xlsx` / `.xls` / `.csv` 格式文件
-- 上传后可预览前5行数据，可选择摘要列
-- 分类过程展示进度条
+- 上传后调用预览接口，展示列名列表和前5行数据
+- 用户可从下拉框选择摘要列名
+- 点击分类后，前端展示"正在处理中"状态，按钮禁用
 - 分类结果自动存入数据库，source='batch'，关联同一 batch_id
-- 分类完成后可跳转历史页面，自动筛选当前批次记录
-- 文件格式错误或摘要列为空时给出明确错误提示
-- 单次上传限制50条，超出提示拆分
+- 单条失败不影响整体流程，失败条目不存库，返回在 failedList 中
+- 分类完成后显示结果摘要（成功数、失败数）
+- 分类完成后可跳转历史页面，按 batch_id 精确筛选当前批次记录
+- 历史页面来源列显示"批量(批次ID)"
+- 文件格式错误、摘要列为空、超过50条时给出明确错误提示
 
 ---
 
