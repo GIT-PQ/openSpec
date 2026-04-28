@@ -162,7 +162,6 @@ PatentServiceImpl 收到结果
 | 方法 | 路径 | 说明 |
 |------|------|------|
 | GET | `/api/record/list` | 查询当前用户的分类记录，支持筛选参数 |
-| GET | `/api/record/{id}` | 查询单条记录详情 |
 
 **数据范围**：所有查询接口仅返回当前登录用户的记录，从请求头 `Authorization: Bearer token_{userId}_{timestamp}` 中解析 userId 作为隐式 WHERE 条件，前端无需传递 userId 参数。
 
