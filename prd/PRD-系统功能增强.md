@@ -253,12 +253,62 @@ PatentServiceImpl 收到结果
 | Java后端 | `RecordService` 新增 `queryAll` 方法 | 全量条件查询（隐式过滤userId） |
 | 前端 | `ClassificationHistory.vue` 新增导出按钮 | 调用导出接口，触发文件下载 |
 
-### 5.6 验收标准
+### 5.6 细化决策
 
-- 点击导出按钮后浏览器下载Excel文件
+| 决策点 | 结论 | 说明 |
+|--------|------|------|
+| Excel库选型 | EasyExcel | 阿里巴巴出品，兼容性好，API简洁 |
+| 导出上限 | 200条 | 超出时前端提示用户缩小筛选范围 |
+| batch_id空值处理 | 占位符 "-" | 单条记录无批次ID时显示 "-" |
+| 前端下载实现 | responseType:'blob' + createObjectURL | axios 设置 responseType，创建临时 URL 触发下载 |
+| Content-Type | 标准 MIME type + Content-Disposition:attachment | 使用 `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`，设置 `Content-Disposition: attachment; filename=xxx.xlsx` |
+| 导出流程 | 先 count 判断，≤200 则全量查询一次性写入 | 避免大数据量导出，接口先返回符合条件的记录数量，前端判断后再执行导出 |
+| 文件命名 | `分类记录_{日期}_{时间}.xlsx` | 如 `分类记录_2026-04-28_143052.xlsx` |
+| 按钮交互 | 二次点击确认 + 导出期间禁用 | 点击后弹窗确认，导出过程中按钮禁用防止重复点击 |
+
+### 5.7 导出流程细化
+
+```
+用户点击"导出Excel"
+       │
+       ▼
+弹窗确认："确定导出当前筛选结果？"
+       │
+       ├─ 取消 → 关闭弹窗
+       │
+       └─ 确定 → 禁用按钮，调用接口
+                    │
+                    ▼
+              GET /api/record/export-check
+              （返回符合条件的记录数量）
+                    │
+                    ├─ count > 200 → 前端提示"超过200条，请缩小筛选范围"
+                    │
+                    └─ count ≤ 200 → 继续调用导出接口
+                                       │
+                                       ▼
+                              GET /api/record/export
+                              （返回 Excel 文件流）
+                                       │
+                                       ▼
+                              前端触发下载，恢复按钮状态
+```
+
+**API 调整**：新增 `/api/record/export-check` 接口用于预检查数量，或 `/api/record/export` 接口返回结构中包含 `count` 字段，前端根据 count 决定是否继续。
+
+**推荐方案**：`/api/record/export` 接口在响应头中返回 `X-Total-Count`，前端根据该值判断：
+- 若 `X-Total-Count > 200`：显示提示，不下载
+- 若 `X-Total-Count ≤ 200`：继续读取响应体并下载
+
+### 5.8 验收标准
+
+- 点击导出按钮后弹出确认框
+- 确认后，若超过200条，前端提示"超过200条，请缩小筛选范围"，不执行导出
+- 若≤200条，浏览器下载 Excel 文件，文件名格式为 `分类记录_{日期}_{时间}.xlsx`
 - 导出内容与当前筛选条件一致（含摘要关键字筛选）
-- Excel字段完整，中文表头正确，置信度为百分比格式
+- Excel 字段完整：序号、专利摘要、预测类别、置信度（百分比格式）、来源、批次ID（空值显示 "-"）、分类时间
 - 无数据时给出提示，不导出空文件
+- 导出过程中按钮禁用，导出完成后恢复
 
 ---
 
