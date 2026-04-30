@@ -13,6 +13,9 @@ from tqdm import tqdm
 import torch
 from torch.nn import Identity
 
+# 2026-04-30
+# 优化嵌入计算，改为每个GPU加载一次模型，处理多个批次，减少模型加载次数，提高效率。
+
 def merge_xlsx_file(dirPath,save=False,saveDir='',newFileName=''):
     merged_df = pd.DataFrame()
     for filename in os.listdir(dirPath):
@@ -148,21 +151,29 @@ def process_abstract_column(df, column_name='abstract', **clean_kwargs):
     return cleaned_df, changed_rows, change_stats
 
 
-def _encode_batch(batch_texts, model_path, device_id, batch_size, normalize_embeddings):
-    device = f"cuda:{device_id}"
+def _encode_batch_on_gpu(model_path, device_id, batch_list, bsz):
+    """在指定 GPU 上加载一次模型，处理多个批次"""
+    device = f'cuda:{device_id}'
     model = SentenceTransformer(model_path, device=device)
+
     # 如果是bge模型 取消模型的默认归一化结构
-    if model_path.find('bge'):
-        model[2] = Identity()
-    embeddings = model.encode(
-        batch_texts,
-        batch_size=batch_size,
-        show_progress_bar=False,
-        device=device,
-        convert_to_numpy=True,
-        normalize_embeddings=normalize_embeddings
-    )
-    return embeddings
+    # if 'bge' in model_path:
+    #     model[2] = Identity()
+
+    results = []
+    for idx, batch_texts in tqdm(batch_list, desc=f"GPU {device_id}", leave=False):
+        embeddings = model.encode(
+            batch_texts,
+            batch_size=bsz,
+            normalize_embeddings=False,
+            show_progress_bar=False
+        )
+        results.append((idx, embeddings))
+
+    del model
+    torch.cuda.empty_cache()
+
+    return results
 
 def sbert_embedding_v2(df, model_path, text_col='摘要', target_col = 'SBERT_Embedding',batch_size=1024):
     df = df.copy()
@@ -176,19 +187,28 @@ def sbert_embedding_v2(df, model_path, text_col='摘要', target_col = 'SBERT_Em
     batches = [texts[i:i + batch_size] for i in range(0, total, batch_size)]
     num_batches = len(batches)
 
-    # 轮询GPU分配任务
-    tasks = [(batches[i], model_path, i % n_gpus, batch_size // n_gpus) for i in range(num_batches)]
-
     print(f"使用 {n_gpus} 个 GPU 进行并行嵌入，共 {num_batches} 个批次...")
 
+    # 按 GPU 分组批次（保持原始顺序）
+    gpu_batches = {i: [] for i in range(n_gpus)}
+    for idx, batch in enumerate(batches):
+        gpu_id = idx % n_gpus
+        gpu_batches[gpu_id].append((idx, batch))
+
+    # 每个 GPU 串行处理分配给它的批次（模型只加载一次）
     results = Parallel(n_jobs=n_gpus)(
-        delayed(_encode_batch)(batch_texts, model_path, device_id, bsz, normalize_embeddings=False)
-        for batch_texts, model_path, device_id, bsz in tqdm(tasks)
+        delayed(_encode_batch_on_gpu)(model_path, gpu_id, batch_list, batch_size // n_gpus)
+        for gpu_id, batch_list in gpu_batches.items()
     )
 
+    # 合并结果并按原始顺序排序
+    all_results = []
+    for gpu_result in results:
+        all_results.extend(gpu_result)
 
-    all_embeddings = np.vstack(results)
-    # all_embeddings = normalize(all_embeddings)
+    all_results.sort(key=lambda x: x[0])  # 按批次索引排序
+    all_embeddings = np.vstack([emb for _, emb in all_results])
+
     print(all_embeddings.shape)
 
     df[target_col] = list(all_embeddings)
