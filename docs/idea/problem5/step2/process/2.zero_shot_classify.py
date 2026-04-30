@@ -268,7 +268,7 @@ async def run_all_rounds(df: pd.DataFrame, n_run: int, output_path: Path):
             continue
 
         print(f"\n{'='*50}")
-        print(f"第 {n}/{n_run} 轮标注 (temperature={TEMPERATURE}, top_p={TOP_P})")
+        # print(f"第 {n}/{n_run} 轮标注 (temperature={TEMPERATURE}, top_p={TOP_P})")
         print(f"{'='*50}")
 
         start = time.time()
