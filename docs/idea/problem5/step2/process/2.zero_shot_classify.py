@@ -32,14 +32,13 @@ if not API_KEY or not MODEL or not BASE_URL:
     sys.exit("错误：请在 .env 中配置 DASHSCOPE_API_KEY、model、base_url")
 
 # ── 22 个类别标签 ─────────────────────────────────────────────
-LABELS = [
-    "中医器械", "临床检验器械", "医用康复器械", "医用成像器械",
-    "医用诊察和监护器械", "医用软件", "医疗器械消毒灭菌器械", "口腔科器械",
-    "呼吸、麻醉和急救器械", "妇产科、辅助生殖和避孕器械", "患者承载器械",
-    "放射治疗器械", "无源手术器械", "无源植入器械", "有源手术器械",
-    "有源植入器械", "注输、护理和防护器械", "物理治疗器械", "眼科器械",
-    "神经和心血管手术器械", "输血、透析和体外循环器械", "骨科手术器械",
-]
+LABELS = [ "有源手术器械", "无源手术器械", "神经和心血管手术器械", "骨科手术器械",
+           "放射治疗器械", "医用成像器械", "医用诊察和监护器械", "呼吸、麻醉和急救器械",
+           "物理治疗器械", "输血、透析和体外循环器械", "医疗器械消毒灭菌器械",
+           "有源植入器械", "无源植入器械", "注输、护理和防护器械",
+           "患者承载器械", "眼科器械", "口腔科器械", "妇产科、辅助生殖和避孕器械",
+           "医用康复器械", "中医器械", "医用软件", "临床检验器械"
+           ]
 
 # ── 限流参数 ─────────────────────────────────────────────────
 # rpm=600，留余量按 500 计算，即约 8.3 req/s
@@ -217,6 +216,69 @@ async def run_with_retry(
     return results
 
 
+async def run_all_rounds(df: pd.DataFrame, n_run: int, output_path: Path):
+    """在同一 event loop 内运行多轮标注，避免 Semaphore 跨 loop 问题"""
+    concurrency = int(RPS * 5)
+    semaphore = asyncio.Semaphore(concurrency)
+    print(f"RPM={RPM}, RPS≈{RPS:.1f}, 并发窗口={concurrency}")
+
+    start_total = time.time()
+    all_results = {}  # key: 申请号, value: dict
+
+    # 断点续跑：加载已有结果
+    existing_cols = []
+    if output_path.exists():
+        existing_df = pd.read_excel(output_path)
+        for _, row in existing_df.iterrows():
+            pid = row["申请号"]
+            all_results[pid] = row.to_dict()
+        existing_cols = [c for c in existing_df.columns if c.startswith("pred_label_")]
+        print(f"已有结果: {len(existing_df)} 条, 已完成轮次: {len(existing_cols)}")
+
+    for n in range(1, n_run + 1):
+        col_name = f"pred_label_{n}"
+        if col_name in existing_cols:
+            print(f"\n第 {n}/{n_run} 轮已存在 ({col_name})，跳过")
+            continue
+
+        print(f"\n{'='*50}")
+        print(f"第 {n}/{n_run} 轮标注 (temperature={TEMPERATURE}, top_p={TOP_P})")
+        print(f"{'='*50}")
+
+        start = time.time()
+        results = await run_with_retry(df, semaphore, desc=f"R{n}")
+        elapsed = time.time() - start
+
+        fail_count = sum(1 for r in results if r["pred_label"] == "请求失败")
+        parse_fail = sum(1 for r in results if r["pred_label"] == "解析错误")
+        valid_count = len(results) - fail_count - parse_fail
+
+        print(f"R{n} 耗时: {elapsed:.1f}s, 有效: {valid_count}, 解析错误: {parse_fail}, 请求失败: {fail_count}")
+
+        # 汇聚到 all_results
+        raw_name = f"raw_output_{n}"
+        for r in results:
+            pid = r["申请号"]
+            if pid not in all_results:
+                all_results[pid] = {"申请号": pid, "true_label": r["true_label"]}
+            all_results[pid][col_name] = r["pred_label"]
+            all_results[pid][raw_name] = r["raw_output"]
+
+        # 每轮标注后立即保存结果
+        result_df = pd.DataFrame(list(all_results.values()))
+        pred_cols = [f"pred_label_{i}" for i in range(1, n + 1) if f"pred_label_{i}" in result_df.columns]
+        raw_cols = [f"raw_output_{i}" for i in range(1, n + 1) if f"raw_output_{i}" in result_df.columns]
+        result_df = result_df[["申请号", "true_label"] + pred_cols + raw_cols]
+        result_df.to_excel(output_path, index=False)
+        print(f"第 {n} 轮结果已保存到: {output_path}")
+
+    elapsed_total = time.time() - start_total
+
+    print(f"\n{'='*50}")
+    print(f"总耗时: {elapsed_total:.1f}s ({n_run} 轮)")
+    print(f"最终结果已保存: {output_path}")
+
+
 def main():
     # ── 超参数 ─────────────────────────────────────────────
     n_run = 10  # 标注轮次
@@ -231,55 +293,8 @@ def main():
     df = pd.read_excel(input_path)
     print(f"数据量: {len(df)}, 类别数: {df['一级产品类别（校对）'].nunique()}")
 
-    # ── 基于 rpm 的限流：semaphore 控制并发窗口 ───────────
-    # 每个请求约 2-5s，并发 = ceil(RPS * 平均延迟)，按 5s 估算
-    concurrency = int(RPS * 5)
-    semaphore = asyncio.Semaphore(concurrency)
-    print(f"RPM={RPM}, RPS≈{RPS:.1f}, 并发窗口={concurrency}")
-
-    # ── 多轮标注 ───────────────────────────────────────────
-    start_total = time.time()
-    all_results = {}  # key: 申请号, value: dict
-
-    for n in range(1, n_run + 1):
-        print(f"\n{'='*50}")
-        print(f"第 {n}/{n_run} 轮标注 (temperature={TEMPERATURE}, top_p={TOP_P})")
-        print(f"{'='*50}")
-
-        start = time.time()
-        results = asyncio.run(run_with_retry(df, semaphore, desc=f"R{n}"))
-        elapsed = time.time() - start
-
-        fail_count = sum(1 for r in results if r["pred_label"] == "请求失败")
-        parse_fail = sum(1 for r in results if r["pred_label"] == "解析错误")
-        valid_count = len(results) - fail_count - parse_fail
-
-        print(f"R{n} 耗时: {elapsed:.1f}s, 有效: {valid_count}, 解析错误: {parse_fail}, 请求失败: {fail_count}")
-
-        # 汇聚到 all_results
-        col_name = f"pred_label_{n}"
-        raw_name = f"raw_output_{n}"
-        for r in results:
-            pid = r["申请号"]
-            if pid not in all_results:
-                all_results[pid] = {"申请号": pid, "true_label": r["true_label"]}
-            all_results[pid][col_name] = r["pred_label"]
-            all_results[pid][raw_name] = r["raw_output"]
-
-    elapsed_total = time.time() - start_total
-
-    # ── 保存结果 ───────────────────────────────────────────
-    result_df = pd.DataFrame(list(all_results.values()))
-
-    # 列顺序：申请号, true_label, pred_label_1..n, raw_output_1..n
-    pred_cols = [f"pred_label_{n}" for n in range(1, n_run + 1)]
-    raw_cols = [f"raw_output_{n}" for n in range(1, n_run + 1)]
-    result_df = result_df[["申请号", "true_label"] + pred_cols + raw_cols]
-    result_df.to_excel(output_path, index=False, encoding="utf-8")
-
-    print(f"\n{'='*50}")
-    print(f"总耗时: {elapsed_total:.1f}s ({n_run} 轮)")
-    print(f"结果已保存: {output_path}")
+    # ── 整个流程在同一个 event loop 中运行 ─────────────────
+    asyncio.run(run_all_rounds(df, n_run, output_path))
 
 
 if __name__ == "__main__":
