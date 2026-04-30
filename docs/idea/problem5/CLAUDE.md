@@ -28,4 +28,8 @@
 > model = xx
 > base_url = xx
 
+## 大模型调用
+- qps: 20-30
+- tpm: 1000000
+- rpm: 600
 
