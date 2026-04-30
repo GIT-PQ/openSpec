@@ -134,7 +134,7 @@ async def classify_one(
                 pred_label = parse_output(raw_output)
                 return {
                     "申请号": row["申请号"],
-                    "true_label": row["一级产品类别（原始）"],
+                    "true_label": row["一级产品类别（校对）"],
                     "pred_label": pred_label,
                     "raw_output": raw_output,
                 }
@@ -144,7 +144,7 @@ async def classify_one(
                 else:
                     return {
                         "申请号": row["申请号"],
-                        "true_label": row["一级产品类别（原始）"],
+                        "true_label": row["一级产品类别（校对）"],
                         "pred_label": "请求失败",
                         "raw_output": str(e),
                     }
@@ -223,13 +223,13 @@ def main():
 
     # ── 路径 ───────────────────────────────────────────────
     base = Path(__file__).resolve().parent.parent
-    input_path = base / "output" / "D2_eb.parquet"
-    output_path = base / "output" / "llm_zeroshot_results.csv"
+    input_path = base / "input" / "D2.xlsx"
+    output_path = base / "output" / "llm_zeroshot_results.xlsx"
 
     # ── 加载数据 ───────────────────────────────────────────
     sys.stdout.reconfigure(encoding="utf-8")
-    df = pd.read_parquet(input_path)
-    print(f"数据量: {len(df)}, 类别数: {df['一级产品类别（原始）'].nunique()}")
+    df = pd.read_excel(input_path)
+    print(f"数据量: {len(df)}, 类别数: {df['一级产品类别（校对）'].nunique()}")
 
     # ── 基于 rpm 的限流：semaphore 控制并发窗口 ───────────
     # 每个请求约 2-5s，并发 = ceil(RPS * 平均延迟)，按 5s 估算
@@ -275,7 +275,7 @@ def main():
     pred_cols = [f"pred_label_{n}" for n in range(1, n_run + 1)]
     raw_cols = [f"raw_output_{n}" for n in range(1, n_run + 1)]
     result_df = result_df[["申请号", "true_label"] + pred_cols + raw_cols]
-    result_df.to_csv(output_path, index=False, encoding="utf-8-sig")
+    result_df.to_excel(output_path, index=False, encoding="utf-8")
 
     print(f"\n{'='*50}")
     print(f"总耗时: {elapsed_total:.1f}s ({n_run} 轮)")
