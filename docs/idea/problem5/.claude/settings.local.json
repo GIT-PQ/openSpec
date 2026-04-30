@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python step2/process/convert_to_jieba_dict.py)"
+    ]
+  }
+}
