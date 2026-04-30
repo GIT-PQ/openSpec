@@ -10,6 +10,7 @@ LLM Zero-Shot 标注方案 — 并发批量标注
 
 import asyncio
 import os
+import random
 import re
 import sys
 import time
@@ -45,10 +46,6 @@ LABELS = [ "有源手术器械", "无源手术器械", "神经和心血管手术
 SAFE_RPM = 450
 MIN_INTERVAL = 60.0 / SAFE_RPM  # ≈0.133s，两次请求之间的最小间隔
 MAX_CONCURRENCY = 30  # 最大并发数（SAFE_RPM/60 × 平均耗时4s ≈ 30）
-
-# ── LLM 生成参数 ─────────────────────────────────────────────
-TEMPERATURE = 0.6
-TOP_P = 0.6
 
 # ── 重试参数 ─────────────────────────────────────────────────
 MAX_RETRIES = 3
@@ -132,6 +129,8 @@ async def classify_one(
 ) -> dict:
     """对单条专利进行分类，带重试"""
     user_prompt = build_user_prompt(row)
+    temperature = random.uniform(0.5, 0.6)
+    top_p = random.uniform(0.5, 0.6)
 
     for attempt in range(MAX_RETRIES):
         async with semaphore:
@@ -143,8 +142,8 @@ async def classify_one(
                         {"role": "system", "content": SYSTEM_PROMPT},
                         {"role": "user", "content": user_prompt},
                     ],
-                    temperature=TEMPERATURE,
-                    top_p=TOP_P,
+                    temperature=temperature,
+                    top_p=top_p,
                     max_tokens=10,
                     extra_body={"enable_thinking": False},
                 )
