@@ -16,3 +16,6 @@
 > 用于存储预测的结果
 > '一级产品类别（原始）' 原始的标签。
 > '一级产品类别（校对）' 专家标注后的标签。
+
+- D:\WorkSpace\JupyterWorkSpace\pq\app\openSpec\docs\idea\problem5\step2\output\jieba_dict
+> 目录：医疗器械分类目录中所有的关键词，可用于分词和bm25
