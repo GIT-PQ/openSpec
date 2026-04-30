@@ -1,0 +1,5 @@
+llm众数预测结果 (n=10):
+  Accuracy: 0.532609
+  Macro F1:  0.494122
+
+Fleiss' Kappa: 0.994383
