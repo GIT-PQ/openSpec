@@ -41,13 +41,14 @@ LABELS = [ "有源手术器械", "无源手术器械", "神经和心血管手术
            ]
 
 # ── 限流参数 ─────────────────────────────────────────────────
-# rpm=600，留余量按 500 计算，即约 8.3 req/s
-RPM = 500
-RPS = RPM / 60  # ≈8.3
+# rpm=600，留余量按 450 计算，确保请求匀速发送
+SAFE_RPM = 450
+MIN_INTERVAL = 60.0 / SAFE_RPM  # ≈0.133s，两次请求之间的最小间隔
+MAX_CONCURRENCY = 30  # 最大并发数（SAFE_RPM/60 × 平均耗时4s ≈ 30）
 
 # ── LLM 生成参数 ─────────────────────────────────────────────
-TEMPERATURE = 0.5
-TOP_P = 0.5
+TEMPERATURE = 0.6
+TOP_P = 0.6
 
 # ── 重试参数 ─────────────────────────────────────────────────
 MAX_RETRIES = 3
@@ -107,9 +108,27 @@ def parse_output(raw: str) -> str:
     return "解析错误"
 
 
+class RateLimiter:
+    """令牌桶式匀速限速器：确保请求间隔不低于 MIN_INTERVAL"""
+
+    def __init__(self, min_interval: float):
+        self._min_interval = min_interval
+        self._last_sent = 0.0
+        self._lock = asyncio.Lock()
+
+    async def acquire(self):
+        async with self._lock:
+            now = time.monotonic()
+            wait = self._min_interval - (now - self._last_sent)
+            if wait > 0:
+                await asyncio.sleep(wait)
+            self._last_sent = time.monotonic()
+
+
 async def classify_one(
     client: AsyncOpenAI,
     semaphore: asyncio.Semaphore,
+    limiter: RateLimiter,
     row: pd.Series,
 ) -> dict:
     """对单条专利进行分类，带重试"""
@@ -117,6 +136,7 @@ async def classify_one(
 
     for attempt in range(MAX_RETRIES):
         async with semaphore:
+            await limiter.acquire()
             try:
                 resp = await client.chat.completions.create(
                     model=MODEL,
@@ -152,11 +172,12 @@ async def classify_one(
 async def batch_classify_once(
     df: pd.DataFrame,
     semaphore: asyncio.Semaphore,
+    limiter: RateLimiter,
     desc: str = "标注",
 ) -> list[dict]:
     """单轮并发批量分类"""
     client = AsyncOpenAI(api_key=API_KEY, base_url=BASE_URL)
-    tasks = [classify_one(client, semaphore, row) for _, row in df.iterrows()]
+    tasks = [classify_one(client, semaphore, limiter, row) for _, row in df.iterrows()]
 
     results = []
     pbar = tqdm(asyncio.as_completed(tasks), total=len(tasks), desc=desc)
@@ -174,12 +195,15 @@ async def retry_failed(
     failed_indices: list[int],
     results: list[dict],
     semaphore: asyncio.Semaphore,
+    limiter: RateLimiter,
     desc: str = "兜底重试",
 ) -> None:
     """对请求失败的行进行兜底重试，原地更新 results"""
     client = AsyncOpenAI(api_key=API_KEY, base_url=BASE_URL)
-    rows = [df.iloc[i] for i in failed_indices]
-    tasks = [classify_one(client, semaphore, row) for row in rows]
+    # 用失败结果中的申请号定位正确的行，而非用 results 列表索引取 df.iloc
+    pid_to_row = {row["申请号"]: row for _, row in df.iterrows()}
+    rows = [pid_to_row[results[i]["申请号"]] for i in failed_indices]
+    tasks = [classify_one(client, semaphore, limiter, row) for row in rows]
 
     pbar = tqdm(asyncio.as_completed(tasks), total=len(tasks), desc=desc)
     new_results = []
@@ -188,18 +212,22 @@ async def retry_failed(
 
     await client.close()
 
-    # 原地更新
-    for idx, new_r in zip(failed_indices, new_results):
-        results[idx] = new_r
+    # 原地更新：按申请号匹配，而非按列表位置
+    new_by_pid = {r["申请号"]: r for r in new_results}
+    for i in failed_indices:
+        pid = results[i]["申请号"]
+        if pid in new_by_pid:
+            results[i] = new_by_pid[pid]
 
 
 async def run_with_retry(
     df: pd.DataFrame,
     semaphore: asyncio.Semaphore,
+    limiter: RateLimiter,
     desc: str = "标注",
 ) -> list[dict]:
     """批量标注 + 兜底重试循环"""
-    results = await batch_classify_once(df, semaphore, desc=desc)
+    results = await batch_classify_once(df, semaphore, limiter, desc=desc)
 
     fail_count = sum(1 for r in results if r["pred_label"] == "请求失败")
     retry_round = 0
@@ -209,7 +237,7 @@ async def run_with_retry(
         await asyncio.sleep(RETRY_COOLDOWN)
 
         failed_indices = [i for i, r in enumerate(results) if r["pred_label"] == "请求失败"]
-        await retry_failed(df, failed_indices, results, semaphore, desc=f"兜底重试 R{retry_round}")
+        await retry_failed(df, failed_indices, results, semaphore, limiter, desc=f"兜底重试 R{retry_round}")
 
         fail_count = sum(1 for r in results if r["pred_label"] == "请求失败")
 
@@ -218,9 +246,9 @@ async def run_with_retry(
 
 async def run_all_rounds(df: pd.DataFrame, n_run: int, output_path: Path):
     """在同一 event loop 内运行多轮标注，避免 Semaphore 跨 loop 问题"""
-    concurrency = int(RPS * 5)
-    semaphore = asyncio.Semaphore(concurrency)
-    print(f"RPM={RPM}, RPS≈{RPS:.1f}, 并发窗口={concurrency}")
+    semaphore = asyncio.Semaphore(MAX_CONCURRENCY)
+    limiter = RateLimiter(MIN_INTERVAL)
+    print(f"SAFE_RPM={SAFE_RPM}, 请求间隔≈{MIN_INTERVAL:.3f}s, 并发窗口={MAX_CONCURRENCY}")
 
     start_total = time.time()
     all_results = {}  # key: 申请号, value: dict
@@ -246,7 +274,7 @@ async def run_all_rounds(df: pd.DataFrame, n_run: int, output_path: Path):
         print(f"{'='*50}")
 
         start = time.time()
-        results = await run_with_retry(df, semaphore, desc=f"R{n}")
+        results = await run_with_retry(df, semaphore, limiter, desc=f"R{n}")
         elapsed = time.time() - start
 
         fail_count = sum(1 for r in results if r["pred_label"] == "请求失败")
