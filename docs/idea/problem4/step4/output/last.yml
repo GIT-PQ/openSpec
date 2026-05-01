@@ -1,0 +1,769 @@
+app:
+  description: ''
+  icon: grinning
+  icon_background: '#FCE7F6'
+  mode: workflow
+  name: last
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/ollama:0.0.7@8fc496b3892344da47db6125c76fc0dbfd8020753f198032751d83f561d9443e
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/tongyi:0.1.41@85be0ee644e13561909e1dc99c73a19896acdcc4e4162f91e2e615cc88d35b44
+kind: app
+version: 0.3.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInLoop: false
+        sourceType: knowledge-retrieval
+        targetType: llm
+      id: 1753836492547-source-1753836529019-target
+      selected: false
+      source: '1753836492547'
+      sourceHandle: source
+      target: '1753836529019'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: knowledge-retrieval
+      id: 1753082848158-source-1753836492547-target
+      selected: false
+      source: '1753082848158'
+      sourceHandle: source
+      target: '1753836492547'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: if-else
+      id: 1753836529019-source-1758501831879-target
+      selected: false
+      source: '1753836529019'
+      sourceHandle: source
+      target: '1758501831879'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: variable-aggregator
+      id: 1758501831879-false-1758503309953-target
+      selected: false
+      source: '1758501831879'
+      sourceHandle: 'false'
+      target: '1758503309953'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: variable-aggregator
+        targetType: end
+      id: 1758503309953-source-1753836598915-target
+      selected: false
+      source: '1758503309953'
+      sourceHandle: source
+      target: '1753836598915'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1758501831879-561d74eb-1044-4130-844d-2d58c3c49177-17585053983850-target
+      selected: false
+      source: '1758501831879'
+      sourceHandle: 561d74eb-1044-4130-844d-2d58c3c49177
+      target: '17585053983850'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: variable-aggregator
+      id: 17585053983850-source-1758503309953-target
+      selected: false
+      source: '17585053983850'
+      sourceHandle: source
+      target: '1758503309953'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1758501831879-7181c3ac-c610-4c3a-8b41-b1fa1e021f04-17585093170990-target
+      selected: false
+      source: '1758501831879'
+      sourceHandle: 7181c3ac-c610-4c3a-8b41-b1fa1e021f04
+      target: '17585093170990'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: variable-aggregator
+      id: 17585093170990-source-1758503309953-target
+      selected: false
+      source: '17585093170990'
+      sourceHandle: source
+      target: '1758503309953'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1758501831879-69e96c3d-3586-4074-a3f8-4d4ddf05133a-17585249693720-target
+      selected: false
+      source: '1758501831879'
+      sourceHandle: 69e96c3d-3586-4074-a3f8-4d4ddf05133a
+      target: '17585249693720'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: variable-aggregator
+      id: 17585249693720-source-1758503309953-target
+      selected: false
+      source: '17585249693720'
+      sourceHandle: source
+      target: '1758503309953'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1758501831879-9325860d-7383-48f0-8ce3-9b2324194eb1-17591514288680-target
+      selected: false
+      source: '1758501831879'
+      sourceHandle: 9325860d-7383-48f0-8ce3-9b2324194eb1
+      target: '17591514288680'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: variable-aggregator
+      id: 17591514288680-source-1758503309953-target
+      selected: false
+      source: '17591514288680'
+      sourceHandle: source
+      target: '1758503309953'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: 开始
+        type: start
+        variables:
+        - label: 摘要
+          max_length: 99999
+          options: []
+          required: false
+          type: paragraph
+          variable: abstract
+      height: 89
+      id: '1753082848158'
+      position:
+        x: 969.2232874756847
+        y: 216.94449690169978
+      positionAbsolute:
+        x: 969.2232874756847
+        y: 216.94449690169978
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        dataset_ids:
+        - 0tH6yqjXOes6fd7t00BfB5EdACLwfCBF57Wh59VzA+bdmV0SpX44IAa7NZc25yVn
+        desc: ''
+        metadata_filtering_mode: disabled
+        metadata_model_config:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: deepseek-r1:8b
+          provider: langgenius/ollama/ollama
+        multiple_retrieval_config:
+          reranking_enable: false
+          reranking_mode: weighted_score
+          top_k: 4
+          weights:
+            keyword_setting:
+              keyword_weight: 0.3
+            vector_setting:
+              embedding_model_name: quentinz/bge-large-zh-v1.5:latest
+              embedding_provider_name: langgenius/ollama/ollama
+              vector_weight: 0.7
+        query_variable_selector:
+        - '1753082848158'
+        - abstract
+        retrieval_mode: multiple
+        selected: false
+        title: 知识检索
+        type: knowledge-retrieval
+      height: 91
+      id: '1753836492547'
+      position:
+        x: 969.2232874756847
+        y: 378.9444969016993
+      positionAbsolute:
+        x: 969.2232874756847
+        y: 378.9444969016993
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1753836492547'
+          - result
+        desc: ''
+        model:
+          completion_params:
+            enable_thinking: false
+            response_format: json_object
+            temperature: 0.7
+            top_p: 0.7
+          mode: chat
+          name: qwen3-8b
+          provider: langgenius/tongyi/tongyi
+        prompt_template:
+        - id: 12a5cac0-804e-4b62-a3d3-f147a7ea2793
+          role: system
+          text: "一、任务\n根据用户输入的摘要，判断该中文发明专利在药监局《医疗器械分类目录》22类的一级产品类别中属于哪一类。\n输出必须是具体中文名称（禁止编号）。\n\
+            \n可选一级产品类别（22类）：\n有源手术器械\n无源手术器械\n神经和心血管手术器械\n骨科手术器械\n放射治疗器械\n医用成像器械\n\
+            医用诊察和监护器械\n呼吸、麻醉和急救器械\n物理治疗器械\n输血、透析和体外循环器械\n医疗器械消毒灭菌器械\n有源植入器械\n无源植入器械\n\
+            注输、护理和防护器械\n患者承载器械\n眼科器械\n口腔科器械\n妇产科、辅助生殖和避孕器械\n医用康复器械\n中医器械\n医用软件\n临床检验器械\n\
+            \n二、正确回答格式\n{\"类别\":\"xx\"}，x指代具体的内容。\n\n三、用户输入\n发明专利摘要：{{#1753082848158.abstract#}}\n\
+            \n四、检索到的知识\n{{#context#}}\n\n五、使用检索到的知识的原则\n1. 检索到的内容**只是可能相关的参考信息**，不能直接当作事实使用。\n\
+            2. 在判断类别时，**必须首先严格依据\"区分重点\"中的规则**，然后结合用户输入摘要进行逻辑推理。\n3. 如果知识库信息与摘要冲突或不明确，**优先相信用户输入的摘要**，而非知识库。\n\
+            4. 检索到的知识可以提供辅助背景，但**不能成为唯一或主要依据**。\n5. 不允许因为检索内容数量多就直接归类，必须通过区分重点逐步推理。\n\
+            \n六、官方定义（来自《医疗器械分类规则》）\n有源医疗器械：任何依靠电能或者其他能源，而不是直接由人体或者重力产生的能量，发挥其功能的医疗器械。\n\
+            无源医疗器械：不依靠电能或者其他能源，但是可以通过由人体或者重力产生的能量，发挥其功能的医疗器械。\n植入器械：借助手术全部或者部分进入人体内或腔道（口）中，并且在手术过程结束后留在人体内30日（含）以上或者被人体吸收的医疗器械。\n\
+            独立软件：具有一个或者多个医疗目的，无需医疗器械硬件即可完成自身预期目的，运行于通用计算平台的软件。\n\n七、区分重点\n有源 vs 无源：关键看是否依赖电、能源，必须有明显的电、能源驱动才可归为有源，不可自行推断是否有源；手术机器人一般属于有源，不能依靠\"\
+            驱动\"二字将其归为有源，除非是\"电驱动\"等等。\n成像 vs 有源手术器械：手术中通过图像诊断 vs 手术中使用的有源器械。\n植入器械\
+            \ vs 手术器械：植入体内长期留存（30日以上或被人体吸收）vs 术中使用术后取出。\n骨科/心血管等专科类：必须明确提及部位/功能，否则不归入专科类。\n\
+            医疗器械消毒灭菌器械 vs 注输、护理和防护器械：灭菌强调的是对器械清洁与消毒灭菌；护理防护是对患者的保护。\n临床检验 vs 诊察监护：样本体外检测\
+            \ vs 患者实时监测。\n康复 vs 承载：康复设备有训练/恢复功能；承载仅用于对患者的支撑/转运。\n有源手术器械 vs 物理治疗：都是有源的，主要看用于手术中，还是用于手术外的治疗。\n\
+            医用软件 vs 硬件器械：独立运行的软件（无需特定医疗器械硬件，运行于通用计算平台）vs 器械的附属控制系统。\n影像学 vs 临床检验：影像是宏观结构，检验是微观样本分析。\n\
+            骨科 vs 无源植入：骨科手术器械是骨科手术中的操作工具；无源植入是长期植入人体内的材料。\n消毒/清洁类要与无源器械区分：一定要注意区分是在描述手术器械，还是在描述清洁器械，对器械消毒。\n\
+            骨科类要与无源手术器械区分：没有明确指出用于骨科手术时的器械，而仅仅是与知识库中的描述吻合，一定不能归于骨科手术器械。\n无源植入和有源植入区分：是否有能源驱动是界定的关键，请注意，电极一般属于有源植入器械。\n\
+            关于显微镜：一般的显微镜是医疗成像器械，请注意，眼科相关的显微镜一定属于眼科器械。\n中医vs诊察监护：关于脉搏测量和诊断，除了测量脉搏血氧饱和度，其他都属于中医器械。\n\
+            医用软件vs医用诊察和监护器械：与AI相关，通过机器学习、视觉图像等进行预测，属于医用软件；涉及算法、数据处理、建模方法、参数优化方法等属于医用软件；大部分智能穿戴设备，如果核心是数据分析和智能判断，归类为医用软件，如果核心是传感器或物理测量装置本身，归类为器械。\n\
+            临床检验器械：涉及到人体样本的采集，组织的取材，优先归为临床检验器械。请注意，采血装置属于临床检验器械，因为它用于样本的采集。\n\n八、最终判断步骤\n\
+            1. **逐句理解摘要**，明确该发明的主要用途、工作原理和关键特征。\n2. 按照\"区分重点\"规则逐一推理：\n   - 是否为医用软件？\n\
+            \   - 是否依赖能源？\n   - 是否用于手术或植入？\n   - 是否用于采集人体样本（临床检验器械）？\n   - 用于治疗还是检测？\n\
+            \   - 是否属于某个明确的专科？\n3. 检索知识仅用于补充说明，不得直接覆盖上述推理结果。\n4. 输出最终类别，并说明\"决策依据\"\
+            和\"理由\"，其中决策依据应来自摘要和区分重点，不得仅引用检索内容。\n\n九、输出\n最终输出必须为严格的 JSON 格式：\n{\"\
+            类别\":\"xx\"}"
+        retry_config:
+          max_retries: 2
+          retry_enabled: false
+          retry_interval: 1000
+        selected: true
+        structured_output:
+          schema:
+            properties:
+              类别:
+                description: 文本的分类结果
+                enum:
+                - 医用成像器械
+                - 医用诊察和监护器械
+                - 无源手术器械
+                - 骨科手术器械
+                - 有源手术器械
+                - 注输、护理和防护器械
+                - 临床检验器械
+                - 医用软件
+                - 眼科器械
+                - 神经和心血管手术器械
+                - 放射治疗器械
+                - 输血、透析和体外循环器械
+                - 物理治疗器械
+                - 呼吸、麻醉和急救器械
+                - 无源植入器械
+                - 有源植入器械
+                - 医疗器械消毒灭菌器械
+                - 患者承载器械
+                - 妇产科、辅助生殖和避孕器械
+                - 口腔科器械
+                - 中医器械
+                - 医用康复器械
+                type: string
+            required:
+            - 类别
+            type: object
+        structured_output_enabled: true
+        title: LLM
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 89
+      id: '1753836529019'
+      position:
+        x: 969.2232874756847
+        y: 580.9444969016986
+      positionAbsolute:
+        x: 969.2232874756847
+        y: 580.9444969016986
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - '1758503309953'
+          - output
+          value_type: object
+          variable: text
+        selected: false
+        title: 结束
+        type: end
+      height: 89
+      id: '1753836598915'
+      position:
+        x: 1831.7814237372581
+        y: 571.4359863911662
+      positionAbsolute:
+        x: 1831.7814237372581
+        y: 571.4359863911662
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        cases:
+        - case_id: 561d74eb-1044-4130-844d-2d58c3c49177
+          conditions:
+          - comparison_operator: is
+            id: 95bc0a92-98f0-4557-9e60-a4ece20f9eb6
+            value: 有源植入器械
+            varType: object
+            variable_selector:
+            - '1753836529019'
+            - structured_output
+            - 类别
+          id: 561d74eb-1044-4130-844d-2d58c3c49177
+          logical_operator: and
+        - case_id: 7181c3ac-c610-4c3a-8b41-b1fa1e021f04
+          conditions:
+          - comparison_operator: is
+            id: 3f232c6b-a8ba-4717-9f64-1601668a4841
+            value: 医用诊察和监护器械
+            varType: object
+            variable_selector:
+            - '1753836529019'
+            - structured_output
+            - 类别
+          id: 7181c3ac-c610-4c3a-8b41-b1fa1e021f04
+          logical_operator: and
+        - case_id: 69e96c3d-3586-4074-a3f8-4d4ddf05133a
+          conditions:
+          - comparison_operator: is
+            id: b465341f-b460-468a-acb8-70ebf3f1f545
+            value: 无源植入器械
+            varType: object
+            variable_selector:
+            - '1753836529019'
+            - structured_output
+            - 类别
+          id: 69e96c3d-3586-4074-a3f8-4d4ddf05133a
+          logical_operator: and
+        - case_id: 9325860d-7383-48f0-8ce3-9b2324194eb1
+          conditions:
+          - comparison_operator: is
+            id: a2c053ec-b49c-43bd-9de1-25091852a7e0
+            value: 医用康复器械
+            varType: object
+            variable_selector:
+            - '1753836529019'
+            - structured_output
+            - 类别
+          id: 9325860d-7383-48f0-8ce3-9b2324194eb1
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: 条件分支
+        type: if-else
+      height: 269
+      id: '1758501831879'
+      position:
+        x: 1246.3199487379916
+        y: 216.94449690169978
+      positionAbsolute:
+        x: 1246.3199487379916
+        y: 216.94449690169978
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        advanced_settings:
+          group_enabled: false
+          groups:
+          - groupId: 3f3b7153-595e-4e25-95b6-366fc61efc0b
+            group_name: Group1
+            output_type: object
+            variables:
+            - - '1753836529019'
+              - structured_output
+            - - '1758501912288'
+              - structured_output
+        desc: ''
+        output_type: object
+        selected: false
+        title: 变量聚合器
+        type: variable-aggregator
+        variables:
+        - - '17585053983850'
+          - structured_output
+        - - '17585093170990'
+          - structured_output
+        - - '17585249693720'
+          - structured_output
+        - - '17591514288680'
+          - structured_output
+        - - '1753836529019'
+          - structured_output
+      height: 195
+      id: '1758503309953'
+      position:
+        x: 1813.3083129864376
+        y: 216.94449690169978
+      positionAbsolute:
+        x: 1813.3083129864376
+        y: 216.94449690169978
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            enable_thinking: false
+            response_format: json_object
+            temperature: 0.6
+            top_p: 0.6
+          mode: chat
+          name: qwen3-8b
+          provider: langgenius/tongyi/tongyi
+        prompt_template:
+        - id: 1147d475-b312-4a89-ab51-04b7da5af30b
+          role: system
+          text: "一、任务  \n根据用户输入的摘要，判断该中文发明专利在药监局《医疗器械分类目录》22类的一级产品类别中属于哪一类。  \n输出必须是具体中文名称（禁止编号）。\n\
+            可选一级产品类别：  \n有源植入器械\n有源手术器械\n\n二、正确回答格式  \n{\"类别\":\"xx\"}，x指代具体的内容。\n\
+            \n三、用户输入  \n发明专利摘要：{{#1753082848158.abstract#}}\n\n四、区分重点\n有源植入器械\n定义：依赖电力或其他能源驱动，整体或部分长期植入人体，用于替代、支持或改善人体功能的医疗器械。\n\
+            核心特征：需植入人体内部，设备通常含电极、芯片、传感器等主动部件；长期与人体组织或器官直接接触。\n常见产品：心脏起搏器、植入式除颤器、脑深部刺激器、植入式泵、人工耳蜗、可植入传感器、刺激电极（植入式脑深部神经刺激电极、植入式脊髓神经刺激电极、植入式骶神经刺激电极、植入式迷走神经刺激电极、测试神经刺激电极、测试刺激电极、神经刺激测试电极）等。\n\
+            关键词：植入、长期留置、体内、体内传感器、植入装置、刺激电极、刺激器等。\n判定规则：若设备需长期留置于人体内，并依赖能源驱动发挥作用，则归入本类。与电极、电极制备方法相关的归入本类。\n\
+            \n有源手术器械\n定义：在手术过程中依赖电力或其他能源驱动，辅助医生进行组织切割、止血、清创、缝合或其他手术操作的医疗器械。\n核心特征：仅在手术或治疗过程中使用，不长期植入人体；主要功能是手术辅助或组织处理。\n\
+            常见产品：电外科设备、超声手术刀、手术机器人、激光手术设备、射频消融设备等。\n关键词：手术、切割、止血、烧灼、清除组织、术中使用、器械刀头、术后移除等。\n\
+            判定规则：若设备在手术场景中依赖能源驱动使用，术后不留置体内，归入本类。若没有明确说明在手术场景中使用，禁止归入本类。"
+        selected: false
+        structured_output:
+          schema:
+            additionalProperties: false
+            properties:
+              类别:
+                description: 类别
+                enum:
+                - 有源植入器械
+                - 有源手术器械
+                type: string
+            required:
+            - 类别
+            type: object
+        structured_output_enabled: true
+        title: 有源植入器械
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 89
+      id: '17585053983850'
+      position:
+        x: 1540.6233627217616
+        y: 216.94449690169978
+      positionAbsolute:
+        x: 1540.6233627217616
+        y: 216.94449690169978
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            enable_thinking: false
+            response_format: json_object
+            temperature: 0.6
+            top_p: 0.6
+          mode: chat
+          name: qwen3-8b
+          provider: langgenius/tongyi/tongyi
+        prompt_template:
+        - id: 1147d475-b312-4a89-ab51-04b7da5af30b
+          role: system
+          text: "一、任务  \n根据用户输入的摘要，判断该中文发明专利在药监局《医疗器械分类目录》22类的一级产品类别中属于哪一类。  \n输出必须是具体中文名称（禁止编号）。\n\
+            可选一级产品类别：  \n医用诊察和监护器械\n医用软件  \n\n二、正确回答格式  \n{类别\":\"xx\"}，x指代具体的内容。\n\
+            \n三、用户输入  \n发明专利摘要：{{#1753082848158.abstract#}}\n\n四、区分重点\n医用诊察和监护器械\n\
+            定义：用于观察、诊察或监测患者生理状态及生命体征的医疗器械。\n核心特征：实时或定期采集患者身体状态信息，用于诊断、监护或辅助决策，不直接实施治疗。\n\
+            常见产品：血压计、听诊器、医用内窥镜、监护仪、胎心监护设备、电子体温计等。\n关键词：监护、监测、观察、诊察、生命体征、血压、体温、心率、呼吸、内窥、实时监控等。\n\
+            判定规则：若设备主要用于观察或监测患者状态，而非直接治疗，则归入本类。\n\n医用软件\n定义：以软件系统、算法模型和数据处理方法和参数优化为核心，用于医疗相关数据采集、处理、分析、诊断辅助或控制医疗设备的系统；用于疾病预测、药物筛选、辅助诊断模型的训练。\n\
+            核心特征：核心创新点在软件、算法、数据处理方法或参数优化，不依赖具体硬件设备作为主要创新点。\n常见产品：医疗影像处理软件、手术规划软件、健康管理应用、康复动作识别算法、AI相关预测系统、参数优化、智能换算等。\n\
+            关键词：软件、算法、程序、系统、界面、数据处理、分析模型、计算机程序产品、移动终端、应用App、图像识别、回归、Adaboost、机器学习、深度学习、注意力机制、神经网络等。\n\
+            判定规则：若专利描述的主要功能为软件或算法实现，且非以实物器械为核心，应归入本类。\n"
+        selected: false
+        structured_output:
+          schema:
+            additionalProperties: false
+            properties:
+              类别:
+                description: 类别
+                enum:
+                - 医用软件
+                - 医用诊察和监护器械
+                type: string
+            required:
+            - 类别
+            type: object
+        structured_output_enabled: true
+        title: 医用诊察和监护器械
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 89
+      id: '17585093170990'
+      position:
+        x: 1540.6233627217616
+        y: 337.25665538149843
+      positionAbsolute:
+        x: 1540.6233627217616
+        y: 337.25665538149843
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            enable_thinking: false
+            response_format: json_object
+            temperature: 0.6
+            top_p: 0.6
+          mode: chat
+          name: qwen3-8b
+          provider: langgenius/tongyi/tongyi
+        prompt_template:
+        - id: 1147d475-b312-4a89-ab51-04b7da5af30b
+          role: system
+          text: "一、任务  \n根据用户输入的摘要，判断该中文发明专利在药监局《医疗器械分类目录》22类的一级产品类别中属于哪一类。  \n输出必须是具体中文名称（禁止编号）。\n\
+            可选一级产品类别：  \n有源植入器械\n无源植入器械\n\n二、正确回答格式  \n{\"类别\":\"xx\"}，x指代具体的内容。\n\
+            \n三、用户输入  \n发明专利摘要：{{#1753082848158.abstract#}}\n\n四、区分重点\n无源植入器械\n定义：不依赖电力或其他能源驱动，整体或部分长期植入人体，用于支持、修复或替代人体组织或器官功能的医疗器械。\n\
+            核心特征：需长期留置于人体内，与人体组织直接接触；设备完全依靠物理或机械结构发挥作用，无主动电气功能。\n常见产品：人工骨、人工关节、骨固定钉、脊柱固定器、心脏瓣膜、血管支架、填充物等。\n\
+            关键词：植入、长期留置、修复、固定、补片、假体、支架、骨钉等。\n判定规则：若描述中无能源驱动或电气元件，且长期留置于人体内，则归入本类；任何含电极、能源驱动的产品绝对禁止归入本类。\n\
+            \n有源植入器械\n定义：依赖电力或其他能源驱动，整体或部分长期植入人体，用于替代、支持或改善人体功能的医疗器械。\n核心特征：依赖电力或能源驱动才能发挥作用，并且需长期留置于人体内部；通常含电极、芯片、植入式传感器等主动部件，持续与人体组织或器官接触。\n\
+            常见产品：心脏起搏器、植入式除颤器、脑电极、脑深部刺激器、植入式泵、人工耳蜗、植入式传感器、刺激电极（植入式脑深部神经刺激电极、植入式脊髓神经刺激电极、植入式骶神经刺激电极、植入式迷走神经刺激电极、测试神经刺激电极、测试刺激电极、神经刺激测试电极）等。\n\
+            关键词：电极、植入式电极、电极植入方法、植入式传感器、能源驱动、长期监测、起搏、刺激等。\n判定规则：若无明确能源驱动或主动部件描述，默认不归入此类；与电极、电极植入方法或植入式传感器相关，归入本类。"
+        selected: false
+        structured_output:
+          schema:
+            additionalProperties: false
+            properties:
+              类别:
+                description: 类别
+                enum:
+                - 有源植入器械
+                - 无源植入器械
+                type: string
+            required:
+            - 类别
+            type: object
+        structured_output_enabled: true
+        title: 无源植入器械
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 89
+      id: '17585249693720'
+      position:
+        x: 1540.6233627217616
+        y: 456.919388131387
+      positionAbsolute:
+        x: 1540.6233627217616
+        y: 456.919388131387
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            enable_thinking: false
+            response_format: json_object
+            temperature: 0.6
+            top_p: 0.6
+          mode: chat
+          name: qwen3-8b
+          provider: langgenius/tongyi/tongyi
+        prompt_template:
+        - id: 1147d475-b312-4a89-ab51-04b7da5af30b
+          role: system
+          text: "一、任务  \n根据用户输入的摘要，判断该中文发明专利在药监局《医疗器械分类目录》22类的一级产品类别中属于哪一类。  \n输出必须是具体中文名称（禁止编号）。\n\
+            可选一级产品类别：  \n医用康复器械\n医用软件 \n患者承载器械\n\n二、正确回答格式  \n{\"类别\":\"xx\"}，x指代具体的内容。\n\
+            \n三、用户输入  \n发明专利摘要：{{#1753082848158.abstract#}}\n\n四、区分重点\n医用软件\n定义：以软件系统、算法模型和数据处理方法与参数优化为核心，用于医疗相关数据采集、处理、分析、诊断辅助或控制医疗设备的系统；用于疾病预测、药物筛选、辅助诊断模型的训练等。\n\
+            核心特征：核心创新点在软件、算法、数据处理方法或参数优化，不依赖具体硬件设备作为主要创新点，硬件仅作为运行载体。\n常见产品：医疗影像处理软件、手术规划软件、健康管理应用、AI预测系统、参数优化、智能换算等。\n\
+            关键词：软件、算法、程序、模型、数据处理、分析、计算机程序产品、应用App、图像识别、回归、Adaboost、机器学习、深度学习、注意力机制、神经网络等。\n\
+            判定规则：若专利同时涉及 软件/算法 与 物理器械/设备优先归入“医用康复器械”，即使包含软件模块；仅当创新点完全体现在软件或算法层面（如机器学习、深度学习等），且不依赖具体硬件设备作为主要创新点时，才判定为“医用软件”。\n\
+            \n医用康复器械\n定义：用于改善、恢复或补偿人体运动、感觉或其他受损功能的康复训练与治疗设备。此类发明通常包含物理硬件，可能结合软件进行数据采集、训练反馈或设备控制，但软件仅为辅助功能，非核心创新点。\n\
+            核心特征：重点在康复训练或功能恢复的物理装置；\n包含驱动机构、机械结构、固定装置、传感器等硬件；可主动或被动带动患者完成训练、检测或康复动作；软件部分仅作为数据采集、分析或控制工具，而非创新核心。\n\
+            常见产品：步态训练设备、康复训练床、平衡训练设备、上下肢被动训练仪、四肢联动康复器、视觉康复设备、听觉康复训练仪、言语康复训练仪、生物反馈训练器、舌肌康复训练器、轮椅车等。\n\
+            关键词：训练、康复、理疗、驱动机构、电机、传感器、床体、机械部件、步态、平衡、振动、固定装置、反馈模块、训练平台、患者佩戴装置、结构改进、轮椅等。\n\
+            判定规则：若专利同时涉及 软件/算法 与 物理器械/设备优先归入“医用康复器械”，即使包含软件模块；仅当创新点完全体现在软件或算法层面（如机器学习、深度学习等），且不依赖具体硬件设备作为主要创新点时，才判定为“医用软件”。\n\
+            \n患者承载器械\n定义：用于承载、搬运或移动患者，以及在检查、治疗过程中进行体位调整和支撑的设备，保障患者在诊疗、手术或护理过程中的安全与舒适。\n\
+            核心特征：重点在于患者承载、移动或体位调整，创新点主要集中在床体结构、滑轨、支撑装置或驱动控制。\n常见产品：电动/手动手术台，电动/手动诊疗台及诊疗椅，电动/手动病床，医用婴儿床；电动/无源手术体位固定架及体位垫；电动/手动推车、担架、转运床、移位机、患者承载椅；\n\
+            电动/手动防压疮垫。\n关键词：床体、床板、滑轨、承载、固定、支撑、体位调整、转运、驱动、电动、手摇、担架、推车、移位、防压疮等。\n判定规则：若描述主要功能是患者承载或移动支持\
+            \ 归入患者承载器械；若用于康复训练或功能恢复 归入医用康复器械；纯软件产品不归入本类。\n"
+        selected: false
+        structured_output:
+          schema:
+            additionalProperties: false
+            properties:
+              类别:
+                description: 类别
+                enum:
+                - 医用软件
+                - 医用康复器械
+                - 患者承载器械
+                type: string
+            required:
+            - 类别
+            type: object
+        structured_output_enabled: true
+        title: 医用康复器械
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 89
+      id: '17591514288680'
+      position:
+        x: 1540.6233627217616
+        y: 580.9444969016986
+      positionAbsolute:
+        x: 1540.6233627217616
+        y: 580.9444969016986
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    viewport:
+      x: -485.68162110255867
+      y: -111.84614043919282
+      zoom: 0.7578582832552012
