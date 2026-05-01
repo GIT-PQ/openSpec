@@ -1,5 +1,17 @@
+zero-shot
+
 llm众数预测结果 (n=10):
   Accuracy: 0.532609
   Macro F1:  0.494122
 
 Fleiss' Kappa: 0.994383
+
+
+提取《医疗器械分类规则》作为系统提示词
+
+D:\WorkSpace\JupyterWorkSpace\pq\app\openSpec\docs>python idea/problem5/step2/process/eval_metrics.py idea/problem5/step2/output/llm_results.xlsx
+众数预测结果 (n=10):
+  Accuracy: 0.599638
+  Macro F1:  0.483593
+
+Fleiss' Kappa: 0.997761
