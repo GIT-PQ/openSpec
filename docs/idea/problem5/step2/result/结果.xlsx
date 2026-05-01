@@ -1,0 +1,8 @@
+pred_col	accuracy	macro_f1	Fleiss' Kappa	备注
+Keyword	0.3324	0.2428		关键词bm25算法，k=12，b=0.3，取top3的avg
+LLM-Zero-Shot	0.5326	0.4941	0.9943	llm只告诉分类目标，不添加任何提示
+Original	0.5833	0.5535		数据集的原始标签
+KNN	0.6141	0.5454		knn，k=5，投票策略weighted
+LLM-Prompt	0.7032	0.6127	0.9958	llm融入《医疗器械分类规则》作为系统提示词
+LLM-Prompt-RAG	0.8958	0.8801	0.9972	llm融入《医疗器械分类规则》作为系统提示词+《医疗器械分类目录》作为rag
+Complete	0.9185	0.9109	0.9998	llm融入《医疗器械分类规则》作为系统提示词+《医疗器械分类目录》作为rag+纠错

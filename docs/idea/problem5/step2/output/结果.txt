@@ -15,3 +15,11 @@ D:\WorkSpace\JupyterWorkSpace\pq\app\openSpec\docs>python idea/problem5/step2/pr
   Macro F1:  0.483593
 
 Fleiss' Kappa: 0.997761
+
+
+优化提示词之后
+众数预测结果 (n=10):
+  Accuracy: 0.703225
+  Macro F1:  0.612702
+
+Fleiss' Kappa: 0.993809
