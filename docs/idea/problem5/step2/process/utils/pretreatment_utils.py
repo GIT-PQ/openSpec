@@ -157,8 +157,8 @@ def _encode_batch_on_gpu(model_path, device_id, batch_list, bsz):
     model = SentenceTransformer(model_path, device=device)
 
     # 如果是bge模型 取消模型的默认归一化结构
-    # if 'bge' in model_path:
-    #     model[2] = Identity()
+    if 'bge' in model_path.lower():
+        model[2] = Identity()
 
     results = []
     for idx, batch_texts in tqdm(batch_list, desc=f"GPU {device_id}", leave=False):
