@@ -89,6 +89,52 @@ report_df["support"] = report_df["support"].astype(int)
 report_df = report_df.sort_values(by="f1-score", ascending=False)
 print(report_df)
 
+# ==================== 各类错误率 & 置信度分层对比 ====================
+print("\n各类错误率：")
+per_class_err = {}
+for label in all_labels:
+    mask = y_true == label
+    if mask.sum() > 0:
+        label_err = 1 - accuracy_score(y_true[mask], y_pred[mask])
+        per_class_err[label] = label_err
+        print(f"  {label}: {label_err:.4f} (n={mask.sum()})")
+
+err_values = list(per_class_err.values())
+print(f"\n22类错误率统计: min={min(err_values):.4f}, max={max(err_values):.4f}, "
+      f"range={max(err_values)-min(err_values):.4f}, std={pd.Series(err_values).std():.4f}")
+
+# 高/低置信分层
+orig_col = "一级产品类别（原始）"
+if orig_col in notnull_df.columns:
+    high_mask = notnull_df[orig_col] == y_pred
+    low_mask = ~high_mask
+
+    high_err = 1 - accuracy_score(y_true[high_mask], y_pred[high_mask])
+    low_err = 1 - accuracy_score(y_true[low_mask], y_pred[low_mask])
+
+    print(f"\n置信度分层错误率:")
+    print(f"  高置信(原始=工作流): {high_err:.4f} (n={high_mask.sum()})")
+    print(f"  低置信(原始≠工作流): {low_err:.4f} (n={low_mask.sum()})")
+    print(f"  差距: {abs(high_err - low_err):.4f} ({abs(high_err - low_err)*100:.2f}pp)")
+    print(f"\n区分度对比: 22类错误率极差={max(err_values)-min(err_values):.4f} vs 置信度差距={abs(high_err-low_err):.4f}")
+
+    # 各置信层内各类错误率
+    for layer_name, layer_mask in [("高置信", high_mask), ("低置信", low_mask)]:
+        print(f"\n{layer_name}层各类错误率：")
+        layer_err = {}
+        for label in all_labels:
+            mask = (y_true == label) & layer_mask
+            if mask.sum() > 0:
+                e = 1 - accuracy_score(y_true[mask], y_pred[mask])
+                layer_err[label] = e
+                print(f"  {label}: {e:.4f} (n={mask.sum()})")
+        if layer_err:
+            vals = list(layer_err.values())
+            print(f"  统计: min={min(vals):.4f}, max={max(vals):.4f}, "
+                  f"range={max(vals)-min(vals):.4f}, std={pd.Series(vals).std():.4f}")
+else:
+    print(f"\n未找到'{orig_col}'列，跳过置信度分层计算")
+
 # ==================== 混淆矩阵 ====================
 cm = confusion_matrix(y_true, y_pred, labels=all_labels)
 cm_df = pd.DataFrame(cm, index=all_labels, columns=all_labels)
