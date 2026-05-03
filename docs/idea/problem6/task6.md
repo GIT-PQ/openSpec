@@ -11,4 +11,9 @@
 # 实现步骤
 - [x] 专家校验：生成的数量较少，可以专家校验生成文本的严谨性
 - [x] 定量评估：基于向量检索，评估生成文本与原文本的相似度，确保生成文本与原文本在技术内容上保持一致。
+- [x] 数据增强类别的选取规则：仅对输血、透析和体外循环器械进行增强，其他类别不增强。详见 [数据增强类别选取规则分析](./output/数据增强类别选取规则分析.md)
 
+# 数据位置
+- 增强数据集:D:\WorkSpace\JupyterWorkSpace\pq\app\openSpec\docs\idea\problem6\input\增强数据集_输血透析体外循环.parquet
+- 原始数据集:D:\WorkSpace\JupyterWorkSpace\pq\app\openSpec\docs\idea\start\output\数据集_D2_D3高置信.parquet
+  两者通过申请号进行数据关联，标签列为last_label，摘要的嵌入列为bge且为保证灵活性未进行归一化
