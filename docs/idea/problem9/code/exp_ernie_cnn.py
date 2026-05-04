@@ -16,7 +16,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report, f1_score, accuracy_score
 from torch.utils.data import Dataset, DataLoader
-from transformers import BertTokenizer, BertModel
+from transformers import AutoModel, AutoTokenizer
 from tqdm import tqdm
 
 # ==================== 配置 ====================
@@ -30,16 +30,17 @@ DATA_PATHS = [
 ERNIE_PATH = "D:/WorkSpace/JupyterWorkSpace/pq/模型/预训练模型/bert/ernie-3.0-base-zh"
 
 TEXT_COL = "摘要"
-LABEL_COL = "标注结果"
+LABEL_COL = "last_label"
 
-# --- 调试参数 ---
-SAMPLE_PER_CLASS = 10   # 每类抽样条数，0=使用全部数据
-EPOCHS = 3              # 调试轮数，正式改为30
-BATCH_SIZE = 8          # 8G显存安全值，正式改为16
+# --- 论文超参数（保持不变）---
+SAMPLE_PER_CLASS = 0   # 每类抽样条数，0=使用全部数据
+EPOCHS = 3             # 论文设定
+BATCH_SIZE = 16        # 论文设定（显存不足时可用梯度累积模拟）
+ACCUMULATION_STEPS = 4 # 梯度累积步数，BATCH_SIZE//ACCUMULATION_STEPS为实际batch
+MAX_LEN = 400          # 论文设定
+LR = 1e-5              # 论文设定
 
 # --- 模型超参数 ---
-MAX_LEN = 400
-LR = 1e-5
 DROPOUT = 0.1
 CNN_KERNELS = [2, 3, 4, 5]
 CNN_CHANNELS = 256
@@ -109,7 +110,8 @@ class ErnieCNN(nn.Module):
     def __init__(self, model_path, class_num, freeze_layers=11,
                  kernel_sizes=[2,3,4,5], num_channels=256, dropout=0.1):
         super().__init__()
-        self.bert = BertModel.from_pretrained(model_path)
+        # 使用AutoModel正确加载ERNIE
+        self.bert = AutoModel.from_pretrained(model_path)
         for name, param in self.bert.named_parameters():
             if any(f"encoder.layer.{i}." in name for i in range(freeze_layers)):
                 param.requires_grad = False
@@ -137,7 +139,8 @@ class ErnieCNN(nn.Module):
 def train():
     set_seed(SEED)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"设备: {device}")
+    actual_batch = max(1, BATCH_SIZE // ACCUMULATION_STEPS)
+    print(f"设备: {device}, 等效batch={BATCH_SIZE}(实际{actual_batch}x{ACCUMULATION_STEPS}累积)")
 
     ts = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     save_dir = os.path.join(OUTPUT_DIR, f"{ts}_ERNIE-CNN")
@@ -147,18 +150,19 @@ def train():
         level=logging.INFO, filename=os.path.join(save_dir, "train.log"),
         filemode='w', format='%(asctime)s - %(message)s', encoding='utf-8'
     )
-    logging.info(f"配置: lr={LR}, batch={BATCH_SIZE}, max_len={MAX_LEN}, dropout={DROPOUT}, "
+    logging.info(f"配置: lr={LR}, batch={BATCH_SIZE}(实际{actual_batch}x{ACCUMULATION_STEPS}累积), max_len={MAX_LEN}, dropout={DROPOUT}, "
                  f"kernels={CNN_KERNELS}, channels={CNN_CHANNELS}, freeze_layers={FREEZE_LAYERS}, "
                  f"sample_per_class={SAMPLE_PER_CLASS}, epochs={EPOCHS}")
 
     (train_t, train_l), (valid_t, valid_l), (test_t, test_l), target_names = load_and_split()
-    tokenizer = BertTokenizer.from_pretrained(ERNIE_PATH)
+    # 使用AutoTokenizer正确加载ERNIE tokenizer
+    tokenizer = AutoTokenizer.from_pretrained(ERNIE_PATH)
 
-    train_loader = DataLoader(TextDataset(train_t, train_l), batch_size=BATCH_SIZE, shuffle=True,
+    train_loader = DataLoader(TextDataset(train_t, train_l), batch_size=actual_batch, shuffle=True,
                               collate_fn=lambda b: collate_fn(b, tokenizer, MAX_LEN))
-    valid_loader = DataLoader(TextDataset(valid_t, valid_l), batch_size=BATCH_SIZE, shuffle=False,
+    valid_loader = DataLoader(TextDataset(valid_t, valid_l), batch_size=actual_batch, shuffle=False,
                               collate_fn=lambda b: collate_fn(b, tokenizer, MAX_LEN))
-    test_loader = DataLoader(TextDataset(test_t, test_l), batch_size=BATCH_SIZE, shuffle=False,
+    test_loader = DataLoader(TextDataset(test_t, test_l), batch_size=actual_batch, shuffle=False,
                              collate_fn=lambda b: collate_fn(b, tokenizer, MAX_LEN))
 
     class_num = len(target_names)
@@ -178,13 +182,18 @@ def train():
     for epoch in range(1, EPOCHS + 1):
         model.train()
         total_loss = 0
-        for input_ids, attn_mask, labels in tqdm(train_loader, desc=f"Epoch {epoch}", ncols=80):
+        optimizer.zero_grad()
+        for i, (input_ids, attn_mask, labels) in enumerate(tqdm(train_loader, desc=f"Epoch {epoch}", ncols=80)):
             input_ids, attn_mask, labels = input_ids.to(device), attn_mask.to(device), labels.to(device)
-            loss = criterion(model(input_ids, attn_mask), labels)
+            # 梯度累积：损失除以累积步数
+            loss = criterion(model(input_ids, attn_mask), labels) / ACCUMULATION_STEPS
             loss.backward()
-            optimizer.step()
-            optimizer.zero_grad()
-            total_loss += loss.item()
+            total_loss += loss.item() * ACCUMULATION_STEPS
+
+            # 每累积ACCUMULATION_STEPS步才更新参数
+            if (i + 1) % ACCUMULATION_STEPS == 0:
+                optimizer.step()
+                optimizer.zero_grad()
 
         model.eval()
         v_preds, v_labels, v_loss = [], [], 0.0
