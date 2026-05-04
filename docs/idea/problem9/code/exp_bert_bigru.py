@@ -161,6 +161,9 @@ def train():
 
     class_num = len(target_names)
     model = BertBiGRU(BERT_PATH, class_num, FREEZE_LAYERS, GRU_HIDDEN, DROPOUT)
+    if torch.cuda.device_count() > 1:
+        print(f"使用多卡并行: {torch.cuda.device_count()} 张GPU")
+        model = nn.DataParallel(model)
     model.to(device)
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
@@ -216,7 +219,8 @@ def train():
 
         if v_f1 > best_f1:
             best_f1, best_epoch, counter = v_f1, epoch, 0
-            torch.save(model.state_dict(), os.path.join(save_dir, "best_model.pth"))
+            state_dict = model.module.state_dict() if hasattr(model, 'module') else model.state_dict()
+            torch.save(state_dict, os.path.join(save_dir, "best_model.pth"))
         else:
             counter += 1
             if counter >= PATIENCE:
