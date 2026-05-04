@@ -4,7 +4,6 @@
 超参数: lr=3e-5, epoch=5, batch_size=64, dropout=0.1
 """
 import os
-import sys
 import random
 import logging
 import numpy as np
@@ -21,21 +20,32 @@ from tqdm import tqdm
 
 # ==================== 配置 ====================
 SEED = 42
-DATA_PATHS = ["./数据集/D1数据集_矫正输血类.parquet", "./数据集/增强数据集.parquet"]
-BERT_PATH = "./预训练模型/bert/chinese-roberta-wwm-ext"
+
+# --- 数据路径（迁移服务器时修改此处）---
+DATA_PATHS = [
+    "D:/WorkSpace/JupyterWorkSpace/pq/app/openSpec/docs/idea/start/output/数据集_D2_D3高置信.parquet",
+    "D:/WorkSpace/JupyterWorkSpace/pq/app/openSpec/docs/idea/start/output/增强数据集_输血透析体外循环.parquet",
+]
+BERT_PATH = "D:/WorkSpace/JupyterWorkSpace/pq/模型/预训练模型/bert/chinese-roberta-wwm-ext"
+
 TEXT_COL = "摘要"
 LABEL_COL = "标注结果"
+
+# --- 调试参数 ---
+SAMPLE_PER_CLASS = 10   # 每类抽样条数，0=使用全部数据
+EPOCHS = 3              # 调试轮数，正式改为30
+BATCH_SIZE = 8          # 8G显存安全值，正式改为64
+
+# --- 模型超参数 ---
 MAX_LEN = 512
-BATCH_SIZE = 64
 LR = 3e-5
-EPOCHS = 30          # 论文5轮，加早停保底
 DROPOUT = 0.1
 GRU_HIDDEN = 256
-FREEZE_LAYERS = 11   # 微调第12层
+FREEZE_LAYERS = 11
 PATIENCE = 3
 WEIGHT_DECAY = 0.001
 LABEL_SMOOTHING = 0.1
-OUTPUT_DIR = "./深度学习分类结果/数据增强之后/对比实验"
+OUTPUT_DIR = "./output"
 
 # ==================== 种子 ====================
 def set_seed(seed):
@@ -73,6 +83,13 @@ def load_and_split():
     data = data[data[LABEL_COL].notna()]
     print(f"总数据: {len(data)}")
 
+    # 每类抽样（调试用）
+    if SAMPLE_PER_CLASS > 0:
+        data = data.groupby(LABEL_COL, group_keys=False).apply(
+            lambda g: g.sample(n=min(SAMPLE_PER_CLASS, len(g)), random_state=SEED)
+        ).reset_index(drop=True)
+        print(f"调试抽样: 每类{SAMPLE_PER_CLASS}条, 共{len(data)}条")
+
     le = LabelEncoder()
     le.fit(data[LABEL_COL])
     target_names = list(le.classes_)
@@ -107,21 +124,18 @@ class BertBiGRU(nn.Module):
 
     def forward(self, input_ids, attention_mask):
         bert_out = self.bert(input_ids=input_ids, attention_mask=attention_mask)
-        embeddings = bert_out.last_hidden_state  # [B, L, H]
-
-        gru_out, _ = self.gru(embeddings)  # [B, L, gru_hidden*2]
-
-        # Mean pooling (mask padding)
+        embeddings = bert_out.last_hidden_state
+        gru_out, _ = self.gru(embeddings)
         mask = attention_mask.unsqueeze(-1).float()
         masked = gru_out * mask
         mean_pooled = masked.sum(dim=1) / mask.sum(dim=1).clamp(min=1e-8)
-
         return self.fc(self.dropout(mean_pooled))
 
 # ==================== 训练 ====================
 def train():
     set_seed(SEED)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"设备: {device}")
 
     ts = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     save_dir = os.path.join(OUTPUT_DIR, f"{ts}_BERT-BiGRU")
@@ -131,8 +145,9 @@ def train():
         level=logging.INFO, filename=os.path.join(save_dir, "train.log"),
         filemode='w', format='%(asctime)s - %(message)s', encoding='utf-8'
     )
-    logging.info(f"配置: lr={LR}, batch={BATCH_SIZE}, dropout={DROPOUT}, "
-                 f"gru_hidden={GRU_HIDDEN}, freeze_layers={FREEZE_LAYERS}")
+    logging.info(f"配置: lr={LR}, batch={BATCH_SIZE}, max_len={MAX_LEN}, dropout={DROPOUT}, "
+                 f"gru_hidden={GRU_HIDDEN}, freeze_layers={FREEZE_LAYERS}, "
+                 f"sample_per_class={SAMPLE_PER_CLASS}, epochs={EPOCHS}")
 
     (train_t, train_l), (valid_t, valid_l), (test_t, test_l), target_names = load_and_split()
     tokenizer = BertTokenizer.from_pretrained(BERT_PATH)
@@ -145,7 +160,7 @@ def train():
                              collate_fn=lambda b: collate_fn(b, tokenizer, MAX_LEN))
 
     class_num = len(target_names)
-    model = nn.DataParallel(BertBiGRU(BERT_PATH, class_num, FREEZE_LAYERS, GRU_HIDDEN, DROPOUT))
+    model = BertBiGRU(BERT_PATH, class_num, FREEZE_LAYERS, GRU_HIDDEN, DROPOUT)
     model.to(device)
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
@@ -155,7 +170,6 @@ def train():
     best_f1, best_epoch, counter = 0, 0, 0
 
     for epoch in range(1, EPOCHS + 1):
-        # ---- 训练 ----
         model.train()
         total_loss = 0
         for input_ids, attn_mask, labels in tqdm(train_loader, desc=f"Epoch {epoch}", ncols=80):
@@ -166,7 +180,6 @@ def train():
             optimizer.zero_grad()
             total_loss += loss.item()
 
-        # ---- 验证 ----
         model.eval()
         v_preds, v_labels, v_loss = [], [], 0.0
         with torch.no_grad():
@@ -185,7 +198,6 @@ def train():
                      f"valid_acc={v_acc:.4f}, valid_macro_f1={v_f1:.4f}")
         logging.info(f"\n验证集分类报告:\n{v_report}")
 
-        # ---- 测试 ----
         t_preds, t_labels = [], []
         with torch.no_grad():
             for input_ids, attn_mask, labels in test_loader:
@@ -212,6 +224,7 @@ def train():
                 break
 
     logging.info(f"训练完成, 验证集最佳macro_f1={best_f1:.4f}(第{best_epoch}轮)")
+    print(f"训练完成, 最佳macro_f1={best_f1:.4f}(第{best_epoch}轮), 日志: {save_dir}")
 
 if __name__ == "__main__":
     train()

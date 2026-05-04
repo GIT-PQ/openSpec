@@ -2,7 +2,6 @@
 实验: ERNIE-CNN 中文专利分类 (雷海卫, 2023)
 来源: 基于ERNIE的中文专利分类研究[J].信息技术与信息化,2023
 超参数: lr=1e-5, epoch=3, batch_size=16, max_len=400
-注: 原文epoch=3较少，这里设为30+早停以公平对比
 """
 import os
 import random
@@ -22,14 +21,25 @@ from tqdm import tqdm
 
 # ==================== 配置 ====================
 SEED = 42
-DATA_PATHS = ["./数据集/D1数据集_矫正输血类.parquet", "./数据集/增强数据集.parquet"]
-ERNIE_PATH = "./预训练模型/bert/ernie-3.0-base-zh"
+
+# --- 数据路径（迁移服务器时修改此处）---
+DATA_PATHS = [
+    "D:/WorkSpace/JupyterWorkSpace/pq/app/openSpec/docs/idea/start/output/数据集_D2_D3高置信.parquet",
+    "D:/WorkSpace/JupyterWorkSpace/pq/app/openSpec/docs/idea/start/output/增强数据集_输血透析体外循环.parquet",
+]
+ERNIE_PATH = "D:/WorkSpace/JupyterWorkSpace/pq/模型/预训练模型/bert/ernie-3.0-base-zh"
+
 TEXT_COL = "摘要"
 LABEL_COL = "标注结果"
-MAX_LEN = 400          # 原文400
-BATCH_SIZE = 16        # 原文16
-LR = 1e-5              # 原文1e-5
-EPOCHS = 30
+
+# --- 调试参数 ---
+SAMPLE_PER_CLASS = 10   # 每类抽样条数，0=使用全部数据
+EPOCHS = 3              # 调试轮数，正式改为30
+BATCH_SIZE = 8          # 8G显存安全值，正式改为16
+
+# --- 模型超参数 ---
+MAX_LEN = 400
+LR = 1e-5
 DROPOUT = 0.1
 CNN_KERNELS = [2, 3, 4, 5]
 CNN_CHANNELS = 256
@@ -37,7 +47,7 @@ FREEZE_LAYERS = 11
 PATIENCE = 3
 WEIGHT_DECAY = 0.001
 LABEL_SMOOTHING = 0.1
-OUTPUT_DIR = "./深度学习分类结果/数据增强之后/对比实验"
+OUTPUT_DIR = "./output"
 
 # ==================== 种子 ====================
 def set_seed(seed):
@@ -75,6 +85,12 @@ def load_and_split():
     data = data[data[LABEL_COL].notna()]
     print(f"总数据: {len(data)}")
 
+    if SAMPLE_PER_CLASS > 0:
+        data = data.groupby(LABEL_COL, group_keys=False).apply(
+            lambda g: g.sample(n=min(SAMPLE_PER_CLASS, len(g)), random_state=SEED)
+        ).reset_index(drop=True)
+        print(f"调试抽样: 每类{SAMPLE_PER_CLASS}条, 共{len(data)}条")
+
     le = LabelEncoder()
     le.fit(data[LABEL_COL])
     target_names = list(le.classes_)
@@ -90,10 +106,6 @@ def load_and_split():
 
 # ==================== 模型 ====================
 class ErnieCNN(nn.Module):
-    """
-    ERNIE-3.0-base-zh + TextCNN
-    ERNIE-3.0 架构与 BERT 兼容，使用 BertModel 加载
-    """
     def __init__(self, model_path, class_num, freeze_layers=11,
                  kernel_sizes=[2,3,4,5], num_channels=256, dropout=0.1):
         super().__init__()
@@ -111,23 +123,21 @@ class ErnieCNN(nn.Module):
 
     def forward(self, input_ids, attention_mask):
         bert_out = self.bert(input_ids=input_ids, attention_mask=attention_mask)
-        embeddings = bert_out.last_hidden_state  # [B, L, H]
-
-        # [B, H, L] for Conv1d
+        embeddings = bert_out.last_hidden_state
         x = embeddings.permute(0, 2, 1)
         conv_outs = []
         for conv in self.convs:
-            c = F.relu(conv(x))          # [B, C, L']
-            c = F.max_pool1d(c, c.size(2)).squeeze(2)  # [B, C]
+            c = F.relu(conv(x))
+            c = F.max_pool1d(c, c.size(2)).squeeze(2)
             conv_outs.append(c)
-
-        cat = torch.cat(conv_outs, dim=1)  # [B, C*num_kernels]
+        cat = torch.cat(conv_outs, dim=1)
         return self.fc(self.dropout(cat))
 
 # ==================== 训练 ====================
 def train():
     set_seed(SEED)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"设备: {device}")
 
     ts = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     save_dir = os.path.join(OUTPUT_DIR, f"{ts}_ERNIE-CNN")
@@ -138,7 +148,8 @@ def train():
         filemode='w', format='%(asctime)s - %(message)s', encoding='utf-8'
     )
     logging.info(f"配置: lr={LR}, batch={BATCH_SIZE}, max_len={MAX_LEN}, dropout={DROPOUT}, "
-                 f"kernels={CNN_KERNELS}, channels={CNN_CHANNELS}, freeze_layers={FREEZE_LAYERS}")
+                 f"kernels={CNN_KERNELS}, channels={CNN_CHANNELS}, freeze_layers={FREEZE_LAYERS}, "
+                 f"sample_per_class={SAMPLE_PER_CLASS}, epochs={EPOCHS}")
 
     (train_t, train_l), (valid_t, valid_l), (test_t, test_l), target_names = load_and_split()
     tokenizer = BertTokenizer.from_pretrained(ERNIE_PATH)
@@ -151,8 +162,8 @@ def train():
                              collate_fn=lambda b: collate_fn(b, tokenizer, MAX_LEN))
 
     class_num = len(target_names)
-    model = nn.DataParallel(ErnieCNN(ERNIE_PATH, class_num, FREEZE_LAYERS,
-                                     CNN_KERNELS, CNN_CHANNELS, DROPOUT))
+    model = ErnieCNN(ERNIE_PATH, class_num, FREEZE_LAYERS,
+                     CNN_KERNELS, CNN_CHANNELS, DROPOUT)
     model.to(device)
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
@@ -162,7 +173,6 @@ def train():
     best_f1, best_epoch, counter = 0, 0, 0
 
     for epoch in range(1, EPOCHS + 1):
-        # ---- 训练 ----
         model.train()
         total_loss = 0
         for input_ids, attn_mask, labels in tqdm(train_loader, desc=f"Epoch {epoch}", ncols=80):
@@ -173,7 +183,6 @@ def train():
             optimizer.zero_grad()
             total_loss += loss.item()
 
-        # ---- 验证 ----
         model.eval()
         v_preds, v_labels, v_loss = [], [], 0.0
         with torch.no_grad():
@@ -192,7 +201,6 @@ def train():
                      f"valid_acc={v_acc:.4f}, valid_macro_f1={v_f1:.4f}")
         logging.info(f"\n验证集分类报告:\n{v_report}")
 
-        # ---- 测试 ----
         t_preds, t_labels = [], []
         with torch.no_grad():
             for input_ids, attn_mask, labels in test_loader:
@@ -219,6 +227,7 @@ def train():
                 break
 
     logging.info(f"训练完成, 验证集最佳macro_f1={best_f1:.4f}(第{best_epoch}轮)")
+    print(f"训练完成, 最佳macro_f1={best_f1:.4f}(第{best_epoch}轮), 日志: {save_dir}")
 
 if __name__ == "__main__":
     train()
