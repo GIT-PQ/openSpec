@@ -1,0 +1,69 @@
+<mxfile host="Electron">
+  <diagram name="图5-2 数据库ER图" id="0">
+    <mxGraphModel dx="957" dy="585" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1000" pageHeight="640" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" parent="1" style="shape=table;startSize=34;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;whiteSpace=wrap;html=1;fontFamily=Times New Roman;fontSize=16;autosizeText=0;labelBackgroundColor=none;labelBorderColor=none;fillColor=#eeeeee;strokeColor=#36393d;" value="user" vertex="1">
+          <mxGeometry height="210" width="310" x="90" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="3" parent="2" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=16;fontStyle=1;whiteSpace=wrap;html=1;fontFamily=Times New Roman;autosizeText=0;labelBackgroundColor=none;labelBorderColor=none;" value="PK id : INT 用户ID" vertex="1">
+          <mxGeometry height="34" width="310" y="34" as="geometry" />
+        </mxCell>
+        <mxCell id="4" parent="2" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=16;whiteSpace=wrap;html=1;fontFamily=Times New Roman;autosizeText=0;labelBackgroundColor=none;labelBorderColor=none;" value="username : VARCHAR(50) 用户名 UNIQUE" vertex="1">
+          <mxGeometry height="34" width="310" y="68" as="geometry" />
+        </mxCell>
+        <mxCell id="5" parent="2" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=16;whiteSpace=wrap;html=1;fontFamily=Times New Roman;autosizeText=0;labelBackgroundColor=none;labelBorderColor=none;" value="password : VARCHAR(100) 加密密码" vertex="1">
+          <mxGeometry height="34" width="310" y="102" as="geometry" />
+        </mxCell>
+        <mxCell id="6" parent="2" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=16;whiteSpace=wrap;html=1;fontFamily=Times New Roman;autosizeText=0;labelBackgroundColor=none;labelBorderColor=none;" value="question : VARCHAR(200) 安全问题" vertex="1">
+          <mxGeometry height="34" width="310" y="136" as="geometry" />
+        </mxCell>
+        <mxCell id="7" parent="2" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=16;whiteSpace=wrap;html=1;fontFamily=Times New Roman;autosizeText=0;labelBackgroundColor=none;labelBorderColor=none;" value="answer : VARCHAR(200) 安全答案" vertex="1">
+          <mxGeometry height="34" width="310" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="8" parent="1" style="shape=table;startSize=34;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;whiteSpace=wrap;html=1;fontFamily=Times New Roman;fontSize=16;autosizeText=0;labelBackgroundColor=none;labelBorderColor=none;fillColor=#eeeeee;strokeColor=#36393d;" value="classification_record" vertex="1">
+          <mxGeometry height="380" width="370" x="570" y="50" as="geometry">
+            <mxRectangle height="34" width="170" x="570" y="50" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="9" parent="8" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=16;fontStyle=1;whiteSpace=wrap;html=1;fontFamily=Times New Roman;autosizeText=0;labelBackgroundColor=none;labelBorderColor=none;" value="PK id : BIGINT 记录ID" vertex="1">
+          <mxGeometry height="34" width="370" y="34" as="geometry" />
+        </mxCell>
+        <mxCell id="10" parent="8" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=16;fontStyle=1;whiteSpace=wrap;html=1;fontFamily=Times New Roman;autosizeText=0;labelBackgroundColor=none;labelBorderColor=none;" value="FK user_id : INT 用户ID" vertex="1">
+          <mxGeometry height="34" width="370" y="68" as="geometry" />
+        </mxCell>
+        <mxCell id="11" parent="8" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=16;whiteSpace=wrap;html=1;fontFamily=Times New Roman;autosizeText=0;labelBackgroundColor=none;labelBorderColor=none;" value="summary : TEXT 专利摘要" vertex="1">
+          <mxGeometry height="34" width="370" y="102" as="geometry" />
+        </mxCell>
+        <mxCell id="12" parent="8" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=16;whiteSpace=wrap;html=1;fontFamily=Times New Roman;autosizeText=0;labelBackgroundColor=none;labelBorderColor=none;" value="pred_label : VARCHAR(100) 预测类别" vertex="1">
+          <mxGeometry height="34" width="370" y="136" as="geometry" />
+        </mxCell>
+        <mxCell id="13" parent="8" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=16;whiteSpace=wrap;html=1;fontFamily=Times New Roman;autosizeText=0;labelBackgroundColor=none;labelBorderColor=none;" value="pred_index : INT 类别索引" vertex="1">
+          <mxGeometry height="34" width="370" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="14" parent="8" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=16;whiteSpace=wrap;html=1;fontFamily=Times New Roman;autosizeText=0;labelBackgroundColor=none;labelBorderColor=none;" value="pred_probability : DOUBLE 预测置信度" vertex="1">
+          <mxGeometry height="34" width="370" y="204" as="geometry" />
+        </mxCell>
+        <mxCell id="15" parent="8" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=16;whiteSpace=wrap;html=1;fontFamily=Times New Roman;autosizeText=0;labelBackgroundColor=none;labelBorderColor=none;" value="top_categories : JSON 22类概率分布" vertex="1">
+          <mxGeometry height="34" width="370" y="238" as="geometry" />
+        </mxCell>
+        <mxCell id="16" parent="8" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=16;whiteSpace=wrap;html=1;fontFamily=Times New Roman;autosizeText=0;labelBackgroundColor=none;labelBorderColor=none;" value="source : VARCHAR(20) single/batch" vertex="1">
+          <mxGeometry height="34" width="370" y="272" as="geometry" />
+        </mxCell>
+        <mxCell id="17" parent="8" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=16;whiteSpace=wrap;html=1;fontFamily=Times New Roman;autosizeText=0;labelBackgroundColor=none;labelBorderColor=none;" value="batch_id : VARCHAR(50) 批次ID" vertex="1">
+          <mxGeometry height="34" width="370" y="306" as="geometry" />
+        </mxCell>
+        <mxCell id="18" parent="8" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=16;whiteSpace=wrap;html=1;fontFamily=Times New Roman;autosizeText=0;labelBackgroundColor=none;labelBorderColor=none;" value="create_time : DATETIME 分类时间" vertex="1">
+          <mxGeometry height="34" width="370" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="19" edge="1" parent="1" source="2" style="endArrow=ERmany;startArrow=ERone;html=1;rounded=0;strokeColor=#666666;fontSize=16;entryX=0;entryY=0.19;exitX=1;exitY=0.2;fontFamily=Times New Roman;autosizeText=0;labelBackgroundColor=none;labelBorderColor=none;" target="8" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="400" y="141" as="sourcePoint" />
+            <mxPoint x="570" y="135" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

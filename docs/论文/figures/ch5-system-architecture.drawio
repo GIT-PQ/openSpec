@@ -1,0 +1,95 @@
+<mxfile host="Electron">
+  <diagram name="图5-1 系统架构图" id="rLHU0wUQ7aYEOMe6Pah6">
+    <mxGraphModel dx="1595" dy="975" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1280" pageHeight="1060" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="JTia2uJlPnEDKY0KnTPR-40" edge="1" parent="1" source="2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontFamily=宋体;fontSize=22;fontColor=#333333;fontStyle=1;labelBackgroundColor=none;endArrow=block;endFill=1;strokeWidth=3;strokeColor=none;" target="3">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="630" y="222" />
+              <mxPoint x="630" y="260" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="JTia2uJlPnEDKY0KnTPR-41" edge="1" parent="1" source="2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;fontFamily=宋体;fontSize=22;fontColor=#333333;fontStyle=1;labelBackgroundColor=none;strokeWidth=3;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="640" y="260" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="2" parent="1" style="swimlane;startSize=32;rounded=0;whiteSpace=wrap;html=1;fontStyle=1;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;strokeWidth=2;" value="表现层（Presentation Layer）" vertex="1">
+          <mxGeometry height="160" width="1160" x="60" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="24" edge="1" parent="2" style="endArrow=block;html=1;rounded=0;orthogonalLoop=1;jettySize=auto;exitX=0.5;exitY=1;entryX=0.5;entryY=0;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=2;fontFamily=宋体;" target="8" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="575" y="130" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8" parent="2" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;strokeWidth=2;" value="专利分类页面&#xa;单条输入 / 批量上传 / 概率可视化" vertex="1">
+          <mxGeometry height="82" width="240" x="460" y="58" as="geometry" />
+        </mxCell>
+        <mxCell id="7" parent="2" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;strokeWidth=2;" value="用户认证&#xa;登录 / 注册 / 找回密码" vertex="1">
+          <mxGeometry height="80" width="210" x="130" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="9" parent="2" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;strokeWidth=2;" value="历史与导出页面&#xa;历史列表 / 详情查看 / Excel导出" vertex="1">
+          <mxGeometry height="82" width="230" x="820" y="58" as="geometry" />
+        </mxCell>
+        <mxCell id="JTia2uJlPnEDKY0KnTPR-45" edge="1" parent="1" source="3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;fontFamily=宋体;fontSize=22;fontColor=#333333;fontStyle=1;labelBackgroundColor=none;strokeWidth=3;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="353.3333333333335" y="460" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="JTia2uJlPnEDKY0KnTPR-46" edge="1" parent="1" source="3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;fontFamily=宋体;fontSize=22;fontColor=#333333;fontStyle=1;labelBackgroundColor=none;strokeWidth=3;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="938.3333333333335" y="460" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3" parent="1" style="swimlane;startSize=32;rounded=0;whiteSpace=wrap;html=1;fontStyle=1;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;strokeWidth=2;" value="服务层（Service Layer）" vertex="1">
+          <mxGeometry height="150" width="1170" x="60" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="11" parent="3" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;strokeWidth=2;" value="Auth模块&#xa;登录注册 / 密保校验 / Token鉴权" vertex="1">
+          <mxGeometry height="82" width="220" x="30" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="12" parent="3" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;strokeWidth=2;" value="Patent模块&#xa;单条分类 / 批量分类 / Excel预览" vertex="1">
+          <mxGeometry height="82" width="220" x="260" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="13" parent="3" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;strokeWidth=2;" value="Record模块&#xa;历史查询 / 详情查看 / Excel导出" vertex="1">
+          <mxGeometry height="82" width="220" x="500" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="14" parent="3" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;strokeWidth=2;" value="RestTemplate&#xa;转发Python推理请求" vertex="1">
+          <mxGeometry height="80" width="210" x="740" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="15" parent="3" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;strokeWidth=2;" value="MyBatis Mapper&#xa;用户与记录持久化" vertex="1">
+          <mxGeometry height="80" width="170" x="980" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="4" parent="1" style="swimlane;startSize=32;rounded=0;whiteSpace=wrap;html=1;fontStyle=1;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;strokeWidth=2;" value="模型层（Model Layer）" vertex="1">
+          <mxGeometry height="390" width="610" x="60" y="465" as="geometry" />
+        </mxCell>
+        <mxCell id="19" parent="4" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;strokeWidth=2;" value="分类头&#xa;TextCNN / Linear" vertex="1">
+          <mxGeometry height="80" width="170" x="100" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="20" parent="4" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;strokeWidth=2;" value="Softmax输出&#xa;22类概率分布" vertex="1">
+          <mxGeometry height="80" width="170" x="360" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="18" parent="4" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;strokeWidth=2;" value="BERT编码器&#xa;chinese-roberta-wwm-ext" vertex="1">
+          <mxGeometry height="80" width="220" x="340" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="5" parent="1" style="swimlane;startSize=32;rounded=0;whiteSpace=wrap;html=1;fontStyle=1;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;strokeWidth=2;" value="数据层（Data Layer）" vertex="1">
+          <mxGeometry height="390" width="500" x="730" y="465" as="geometry" />
+        </mxCell>
+        <mxCell id="21" parent="5" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;strokeWidth=2;" value="MySQL5.7&lt;div&gt;user classification_record&lt;/div&gt;" vertex="1">
+          <mxGeometry height="110" width="270" x="110" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="23" parent="5" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;strokeWidth=2;" value="模型权重与配置&#xa;best_model.pth / curr_config.yml" vertex="1">
+          <mxGeometry height="86" width="360" x="85" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="22" parent="5" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;strokeWidth=2;" value="预训练BERT词表&#xa;chinese-roberta-wwm-ext" vertex="1">
+          <mxGeometry height="86" width="250" x="130" y="284" as="geometry" />
+        </mxCell>
+        <mxCell id="17" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;strokeWidth=2;" value="Tokenizer&#xa;分词与编码" vertex="1">
+          <mxGeometry height="80" width="160" x="170" y="565" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
