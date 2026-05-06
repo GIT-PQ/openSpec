@@ -28,7 +28,7 @@ DeepPatent（18年）：
     macro avg     0.8474    0.7659    0.7951      3450
  weighted avg     0.8920    0.8945    0.8910      3450
 
-SVM:
+KNN（只取机器学习中最好的）:
                precision    recall  f1-score   support
      accuracy                         0.9110      3450
     macro avg     0.8796    0.7733    0.8133      3450

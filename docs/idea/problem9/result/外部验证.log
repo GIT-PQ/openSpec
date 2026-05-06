@@ -1,5 +1,10 @@
-=== 分类报告 ===
+本文模型：
                precision    recall  f1-score   support
-     accuracy                         0.9000       110
-    macro avg     0.9143    0.9000    0.8983       110
- weighted avg     0.9143    0.9000    0.8983       110
+     accuracy                         0.8424       330
+    macro avg     0.8659    0.8579    0.8546       330
+ weighted avg     0.8595    0.8424    0.8428       330
+
+医知桥：
+与论文保持一致
+评估对象	Accuracy	Macro F1-score	Weighted F1-score
+医知桥	0.7515 	 0.7538 	0.7352

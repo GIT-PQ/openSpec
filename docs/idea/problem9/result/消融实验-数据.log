@@ -10,7 +10,7 @@
     macro avg     0.8478    0.8422    0.8408      3444
  weighted avg     0.9247    0.9245    0.9235      3444
 
-测试集分类报告：
+原始标签（没经过重新标注）：
                precision    recall  f1-score   support
 
      accuracy                         0.8939      3444
