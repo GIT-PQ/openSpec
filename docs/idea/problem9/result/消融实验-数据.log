@@ -1,0 +1,18 @@
+数据增强：
+               precision    recall  f1-score   support
+     accuracy                         0.9261      3450
+    macro avg     0.9046    0.8604    0.8792      3450
+ weighted avg     0.9256    0.9261    0.9249      3450
+
+不数据增强：
+               precision    recall  f1-score   support
+     accuracy                         0.9245      3444
+    macro avg     0.8478    0.8422    0.8408      3444
+ weighted avg     0.9247    0.9245    0.9235      3444
+
+测试集分类报告：
+               precision    recall  f1-score   support
+
+     accuracy                         0.8939      3444
+    macro avg     0.8780    0.6940    0.7450      3444
+ weighted avg     0.8932    0.8939    0.8878      3444

@@ -1,0 +1,8 @@
+本文模型：
+               precision    recall  f1-score   support
+     accuracy                         0.8424       330
+    macro avg     0.8659    0.8579    0.8546       330
+ weighted avg     0.8595    0.8424    0.8428       330
+
+医知桥：
+与论文保持一致

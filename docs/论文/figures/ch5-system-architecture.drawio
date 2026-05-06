@@ -31,31 +31,31 @@
           <mxGeometry height="82" width="220" x="30" y="58" as="geometry" />
         </mxCell>
         <mxCell id="12" parent="3" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#000000;strokeColor=#666666;strokeWidth=2;" value="Patent模块&#xa;单条分类 / 批量分类 / Excel预览" vertex="1">
-          <mxGeometry height="82" width="220" x="260" y="58" as="geometry" />
+          <mxGeometry height="82" width="220" x="284" y="58" as="geometry" />
         </mxCell>
         <mxCell id="13" parent="3" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#000000;strokeColor=#666666;strokeWidth=2;" value="Record模块&#xa;历史查询 / 详情查看 / Excel导出" vertex="1">
-          <mxGeometry height="82" width="220" x="500" y="58" as="geometry" />
+          <mxGeometry height="82" width="220" x="540" y="58" as="geometry" />
         </mxCell>
         <mxCell id="14" parent="3" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#000000;strokeColor=#666666;strokeWidth=2;" value="RestTemplate&#xa;转发Python推理请求" vertex="1">
-          <mxGeometry height="80" width="210" x="110" y="160" as="geometry" />
+          <mxGeometry height="80" width="210" x="126" y="160" as="geometry" />
         </mxCell>
         <mxCell id="15" parent="3" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#000000;strokeColor=#666666;strokeWidth=2;" value="MyBatis Mapper&#xa;用户与记录持久化" vertex="1">
-          <mxGeometry height="80" width="170" x="420" y="160" as="geometry" />
+          <mxGeometry height="80" width="180" x="470" y="160" as="geometry" />
         </mxCell>
         <mxCell id="4" parent="1" style="swimlane;startSize=32;rounded=0;whiteSpace=wrap;html=1;fontStyle=1;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#000000;strokeColor=#666666;strokeWidth=2;" value="模型层（Model Layer）" vertex="1">
-          <mxGeometry height="180" width="290" x="190" y="530" as="geometry" />
+          <mxGeometry height="180" width="420" x="190" y="530" as="geometry" />
         </mxCell>
         <mxCell id="17" parent="4" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#000000;strokeColor=#666666;strokeWidth=2;" value="分词器和编码器" vertex="1">
-          <mxGeometry height="80" width="160" x="60" y="60" as="geometry" />
+          <mxGeometry height="80" width="160" x="40" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="23" parent="4" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#000000;strokeColor=#666666;strokeWidth=2;" value="模型权重" vertex="1">
+          <mxGeometry height="86" width="140" x="250" y="57" as="geometry" />
         </mxCell>
         <mxCell id="5" parent="1" style="swimlane;startSize=32;rounded=0;whiteSpace=wrap;html=1;fontStyle=1;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#000000;strokeColor=#666666;strokeWidth=2;" value="数据层（Data Layer）" vertex="1">
-          <mxGeometry height="180" width="470" x="510" y="530" as="geometry" />
+          <mxGeometry height="180" width="330" x="650" y="530" as="geometry" />
         </mxCell>
         <mxCell id="21" parent="5" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#000000;strokeColor=#666666;strokeWidth=2;" value="MySQL5.7&lt;div&gt;user classification_record&lt;/div&gt;" vertex="1">
-          <mxGeometry height="110" width="280" x="10" y="50" as="geometry" />
-        </mxCell>
-        <mxCell id="23" parent="5" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;fontFamily=宋体;fontSize=22;labelBackgroundColor=none;fillColor=#f5f5f5;fontColor=#000000;strokeColor=#666666;strokeWidth=2;" value="模型权重" vertex="1">
-          <mxGeometry height="86" width="140" x="310" y="62" as="geometry" />
+          <mxGeometry height="110" width="280" x="25" y="45" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

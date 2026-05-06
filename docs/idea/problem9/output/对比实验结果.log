@@ -1,0 +1,38 @@
+本文模型：
+               precision    recall  f1-score   support
+     accuracy                         0.9261      3450
+    macro avg     0.9046    0.8604    0.8792      3450
+ weighted avg     0.9256    0.9261    0.9249      3450
+
+RAMHA（25年）：
+               precision    recall  f1-score   support
+     accuracy                         0.9232      3450
+    macro avg     0.8894    0.8470    0.8655      3450
+ weighted avg     0.9228    0.9232    0.9220      3450
+
+PaECTER（24年）：
+               precision    recall  f1-score   support
+     accuracy                         0.9217      3450
+    macro avg     0.8790    0.8431    0.8572      3450
+ weighted avg     0.9225    0.9217    0.9210      3450
+
+PatentSBERTa（21年）：
+               precision    recall  f1-score   support
+     accuracy                         0.9128      3450
+    macro avg     0.8828    0.8178    0.8430      3450
+ weighted avg     0.9141    0.9128    0.9121      3450
+
+DeepPatent（18年）：
+               precision    recall  f1-score   support
+     accuracy                         0.8945      3450
+    macro avg     0.8474    0.7659    0.7951      3450
+ weighted avg     0.8920    0.8945    0.8910      3450
+
+SVM:
+               precision    recall  f1-score   support
+     accuracy                         0.9110      3450
+    macro avg     0.8796    0.7733    0.8133      3450
+ weighted avg     0.9108    0.9110    0.9083      3450
+
+
+

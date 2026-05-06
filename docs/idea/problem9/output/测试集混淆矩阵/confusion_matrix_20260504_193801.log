@@ -1,0 +1,44 @@
+2026-05-04 19:38:01,884 - INFO - ============================================================
+2026-05-04 19:38:01,884 - INFO - 开始生成测试集混淆矩阵
+2026-05-04 19:38:01,884 - INFO - ============================================================
+2026-05-04 19:38:01,947 - INFO - 使用设备: cuda
+2026-05-04 19:38:01,948 - ERROR - 生成混淆矩阵过程中出现错误：Incorrect path_or_model_id: 'I:/pq/A61B/预训练模型/bert\chinese-roberta-wwm-ext'. Please provide either the path to a local folder or the repo_id of a model on the Hub.
+Traceback (most recent call last):
+  File "D:\language\Python\Lib\site-packages\transformers\utils\hub.py", line 402, in cached_file
+    resolved_file = hf_hub_download(
+                    ^^^^^^^^^^^^^^^^
+  File "D:\language\Python\Lib\site-packages\huggingface_hub\utils\_deprecation.py", line 101, in inner_f
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\language\Python\Lib\site-packages\huggingface_hub\utils\_validators.py", line 106, in _inner_fn
+    validate_repo_id(arg_value)
+  File "D:\language\Python\Lib\site-packages\huggingface_hub\utils\_validators.py", line 154, in validate_repo_id
+    raise HFValidationError(
+huggingface_hub.errors.HFValidationError: Repo id must be in the form 'repo_name' or 'namespace/repo_name': 'I:/pq/A61B/预训练模型/bert\chinese-roberta-wwm-ext'. Use `repo_type` argument if needed.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\WorkSpace\JupyterWorkSpace\pq\模型\4.6返修-生成混淆矩阵.py", line 230, in <module>
+    generate_confusion_matrix(
+  File "D:\WorkSpace\JupyterWorkSpace\pq\模型\4.6返修-生成混淆矩阵.py", line 139, in generate_confusion_matrix
+    model, config, device = load_model_and_config(config_path, model_path, num_labels=len(LABELS))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\WorkSpace\JupyterWorkSpace\pq\模型\4.6返修-生成混淆矩阵.py", line 62, in load_model_and_config
+    model = get_model(config, num_labels)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\WorkSpace\JupyterWorkSpace\pq\模型\code\utils\model_utils.py", line 66, in get_model
+    return model_factory[config.model.name]()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\WorkSpace\JupyterWorkSpace\pq\模型\code\utils\model_utils.py", line 39, in <lambda>
+    "TextCNN": lambda: BertTextCNNClassifier(
+                       ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\WorkSpace\JupyterWorkSpace\pq\模型\code\models\bert_textcnn.py", line 18, in __init__
+    self.bert = BertModel.from_pretrained(model_path)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\language\Python\Lib\site-packages\transformers\modeling_utils.py", line 3225, in from_pretrained
+    resolved_config_file = cached_file(
+                           ^^^^^^^^^^^^
+  File "D:\language\Python\Lib\site-packages\transformers\utils\hub.py", line 466, in cached_file
+    raise EnvironmentError(
+OSError: Incorrect path_or_model_id: 'I:/pq/A61B/预训练模型/bert\chinese-roberta-wwm-ext'. Please provide either the path to a local folder or the repo_id of a model on the Hub.

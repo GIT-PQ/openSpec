@@ -1,0 +1,5 @@
+=== 分类报告 ===
+               precision    recall  f1-score   support
+     accuracy                         0.9000       110
+    macro avg     0.9143    0.9000    0.8983       110
+ weighted avg     0.9143    0.9000    0.8983       110
