@@ -1,0 +1,15 @@
+RAMHA: A Hybrid Social Text-Based Transformer with Adapter for Mental Health Emotion Classification
+http://doaj-org-s.vpn.syphu.edu.cn:8118/article/44f9b76ff2f64793aeb1fa3f3f79c577
+2025-10-03
+
+PaECTER: Patent-level Representation Learning using Citation-informed Transformers
+https://arxiv.org/abs/2402.19411
+2024-2-29 V1
+
+PatentSBERTa: A Deep NLP based Hybrid Model for Patent Distance and Classification using Augmented SBERT
+https://arxiv.org/abs/2103.11933
+2021-3-22 V1
+
+DeepPatent: patent classification with convolutional neural networks and word embedding
+https://sci-hub.kvnp.top/10.1007/s11192-018-2905-5
+2018-12-28

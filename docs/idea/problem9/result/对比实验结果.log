@@ -30,9 +30,9 @@ DeepPatent（18年）：
 
 KNN（只取机器学习中最好的）:
                precision    recall  f1-score   support
-     accuracy                         0.9110      3450
-    macro avg     0.8796    0.7733    0.8133      3450
- weighted avg     0.9108    0.9110    0.9083      3450
+     accuracy                         0.8942      3450
+    macro avg     0.8784    0.6949    0.7461      3450
+ weighted avg     0.8935    0.8942    0.8884      3450
 
 
 
